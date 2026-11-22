@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שלדת כלי הקטיף – לוח תכנון</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e1113; --panel:#161a1e; --panel2:#1c2126; --line:#2a3138; --line2:#353d46;
+  --text:#e9ebee; --muted:#8e979f; --dim:#5f6870;
+  --chili:#ff5a4e; --jal:#7bd389; --amber:#f6b73c; --sky:#4fb3ff; --violet:#9b8cff;
+  --ok:#57c97a; --bad:#ff5a4e; --acc:#f6b73c;
+  --r:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Rubik,system-ui,sans-serif;font-size:13px}
+button,input,select,textarea{font-family:inherit;font-size:12.5px;color:var(--text)}
+.num,.mono{font-family:"JetBrains Mono",ui-monospace,monospace;direction:ltr;unicode-bidi:isolate}
+#app{display:grid;grid-template-rows:52px 1fr 42px;height:100vh}
+header{display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#14181b,#111417)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;white-space:nowrap}
+.brand .dot{width:22px;height:22px;border-radius:7px;background:conic-gradient(from 200deg,var(--chili),var(--amber),var(--jal),var(--chili));box-shadow:0 0 0 2px #0e1113 inset}
+.brand small{font-weight:400;color:var(--muted);font-size:12px}
+.seg{display:inline-flex;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:2px;gap:2px}
+.seg button{background:none;border:0;padding:5px 10px;border-radius:7px;cursor:pointer;color:var(--muted)}
+.seg button.on{background:#2a3138;color:var(--text)}
+.btn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:5px 10px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--line2);background:#222830}
+.btn.pri{background:var(--amber);color:#1a1405;border-color:var(--amber);font-weight:600}
+.btn.red{color:var(--chili)}
+.btn:disabled{opacity:.4;cursor:default}
+.sp{flex:1}
+#sync{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+#sync i{width:8px;height:8px;border-radius:50%;background:var(--dim);display:inline-block}
+#sync.on i{background:var(--ok)} #sync.busy i{background:var(--amber)} #sync.off i{background:var(--chili)}
+main{display:grid;grid-template-columns:270px 1fr 300px;min-height:0}
+aside{background:var(--panel);overflow:auto;min-height:0}
+#compPanel{border-left:1px solid var(--line)}
+#ctrlPanel{border-right:1px solid var(--line)}
+.ph{position:sticky;top:0;background:var(--panel);z-index:2;padding:10px 12px 8px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.ph h3{margin:0;font-size:13px;font-weight:600}
+.ph .muted{font-size:11.5px}
+.muted{color:var(--muted)}
+.grp{padding:6px 8px 2px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;margin-top:4px}
+.grp b{width:8px;height:8px;border-radius:2px;display:inline-block}
+.crow{display:flex;align-items:center;gap:7px;padding:6px 10px;margin:1px 6px;border-radius:8px;cursor:pointer;border:1px solid transparent}
+.crow:hover{background:var(--panel2)}
+.crow.sel{background:#232a31;border-color:var(--amber)}
+.crow .sw{width:10px;height:10px;border-radius:3px;flex:none}
+.crow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crow .qty{font-size:11px;color:var(--muted)}
+.crow .warn{width:7px;height:7px;border-radius:50%;background:var(--chili);flex:none}
+.crow .lk{font-size:11px}
+.ib{width:20px;height:20px;border-radius:50%;border:1px solid var(--line2);background:none;color:var(--muted);cursor:pointer;font-size:11px;line-height:18px;padding:0;flex:none;font-style:italic;font-family:Georgia,serif}
+.ib:hover{color:var(--text);border-color:var(--muted)}
+#center{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
+#kpis{display:flex;gap:8px;padding:10px 12px 8px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:7px 9px;min-width:92px;flex:1 1 0;overflow:hidden}
+.kpi .l{overflow:hidden;text-overflow:ellipsis}
+.kpi .l{font-size:11px;color:var(--muted);white-space:nowrap}
+.kpi .v{font-size:15px;font-weight:600;margin-top:2px;white-space:nowrap}
+.kpi .v small{font-size:11px;color:var(--muted);font-weight:400;margin-inline-start:3px}
+.kpi.bad .v{color:var(--chili)} .kpi.good .v{color:var(--jal)}
+#stage{flex:1;position:relative;min-height:0;background:radial-gradient(ellipse at 50% 35%,#1a1f24,#101316 75%)}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#stageTools{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:6px;direction:ltr}
+#stageTools button{width:32px;height:32px;border-radius:8px;background:rgba(22,26,30,.9);border:1px solid var(--line);cursor:pointer;font-size:15px}
+#tip{position:absolute;pointer-events:none;background:rgba(14,17,19,.92);border:1px solid var(--line2);border-radius:7px;padding:3px 8px;font-size:11.5px;white-space:nowrap;display:none;z-index:4;transform:translate(-50%,calc(-100% - 12px))}
+#tip .m{color:var(--muted);font-size:10.5px}
+#hint{position:absolute;bottom:8px;left:10px;font-size:11px;color:var(--dim);pointer-events:none;direction:rtl}
+#preview{position:absolute;top:10px;right:50%;transform:translateX(50%);max-width:92%;background:#2b2410;border:1px solid var(--amber);border-radius:10px;padding:8px 12px;display:none;gap:10px;align-items:center;z-index:5}
+#preview.on{display:flex}
+#checks{display:flex;gap:6px;padding:8px 12px;border-top:1px solid var(--line);overflow-x:auto;background:var(--panel)}
+.chk{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;white-space:nowrap;font-size:12px}
+.chk i{width:9px;height:9px;border-radius:50%;background:var(--ok)}
+.chk.bad i{background:var(--bad)} .chk.acc i{background:var(--amber)}
+.chk.bad{border-color:#5a2a27} .chk.acc{border-color:#5a4a20}
+.chk .c{font-size:11px;color:var(--muted)}
+#selPanel{border-top:1px solid var(--line);background:var(--panel);padding:8px 12px;display:none}
+#selPanel.on{display:block}
+#selPanel .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#selPanel .title{font-weight:600;margin-inline-end:6px}
+#selPanel .acts{display:flex;gap:5px;flex-wrap:wrap}
+#selPanel .acts .btn{padding:4px 8px;font-size:12px}
+#selPanel .btn.on{border-color:var(--amber);color:var(--amber)}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:6px 10px;margin-top:8px}
+.fld label{display:block;font-size:10.5px;color:var(--muted);margin-bottom:2px}
+.fld input,.fld select{width:100%;background:#0f1215;border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+.fld input[type=number]{font-family:"JetBrains Mono",monospace;direction:ltr;text-align:left}
+.est{color:var(--amber);font-size:10px;margin-inline-start:3px}
+.sec{border-bottom:1px solid var(--line);padding:10px 12px}
+.sec h4{margin:0 0 8px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:6px}
+.sec h4 .muted{font-weight:400;font-size:11px}
+.sl{display:grid;grid-template-columns:1fr 58px;gap:2px 8px;align-items:center;margin-bottom:7px}
+.sl label{font-size:11.5px;color:var(--muted);grid-column:1/3;display:flex;justify-content:space-between}
+.sl input[type=range]{width:100%;accent-color:var(--amber)}
+.sl input[type=number]{width:58px;background:#0f1215;border:1px solid var(--line);border-radius:6px;padding:3px 5px;font-family:"JetBrains Mono",monospace;direction:ltr;text-align:left}
+.ro{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:12px;margin-top:6px}
+.ro span:nth-child(odd){color:var(--muted)}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.row .btn{flex:1}
+.tg{display:flex;align-items:center;gap:7px;font-size:12px;margin:4px 0;cursor:pointer}
+.tg input{accent-color:var(--amber)}
+select.s{background:#0f1215;border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+footer{display:flex;align-items:center;gap:6px;padding:0 10px;border-top:1px solid var(--line);background:#111417;overflow-x:auto}
+.tab{position:relative;display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);cursor:pointer;white-space:nowrap}
+.tab.on{border-color:var(--amber);background:#241f12}
+.tab .ta{display:none;gap:2px}
+.tab:hover .ta{display:flex}
+.tab .ta button{background:none;border:0;color:var(--muted);cursor:pointer;padding:0 3px;font-size:12px}
+.tab .ta button:hover{color:var(--text)}
+.tab .w{font-size:10.5px;color:var(--chili)}
+#modal{position:fixed;inset:0;background:rgba(5,7,9,.6);display:none;align-items:center;justify-content:center;z-index:20}
+#modal.on{display:flex}
+#mbox{background:var(--panel);border:1px solid var(--line2);border-radius:14px;width:min(760px,94vw);max-height:86vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#mbox .mh{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel)}
+#mbox .mh h3{margin:0;font-size:14px;flex:1}
+#mbox .mb{padding:14px 16px}
+#mbox table{border-collapse:collapse;width:100%;font-size:12px}
+#mbox td,#mbox th{border-bottom:1px solid var(--line);padding:6px 6px;text-align:right;vertical-align:top}
+#mbox th{color:var(--muted);font-weight:500}
+#mbox input[type=number]{width:72px;background:#0f1215;border:1px solid var(--line);border-radius:6px;padding:3px 5px;font-family:"JetBrains Mono",monospace;direction:ltr}
+#mbox textarea{width:100%;min-height:70px;background:#0f1215;border:1px solid var(--line);border-radius:8px;padding:8px}
+.issue{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:8px;background:var(--panel2)}
+.issue .row{margin-top:6px}
+.why{background:#12161a;border-radius:10px;padding:10px 12px;margin:10px 0;font-size:12px;line-height:1.55}
+.pill{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11px;border:1px solid var(--line2);color:var(--muted)}
+.okc{color:var(--jal)} .badc{color:var(--chili)} .accc{color:var(--amber)}
+a{color:var(--sky)}
+#toast{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);background:#20262c;border:1px solid var(--line2);padding:8px 14px;border-radius:10px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:30}
+#toast.on{opacity:1}
+body.present .edit{display:none!important}
+body.present #compPanel .crow{cursor:default}
+.kbd{font-family:"JetBrains Mono",monospace;font-size:10.5px;border:1px solid var(--line2);border-radius:4px;padding:0 4px}
+@media (max-width:1100px){main{grid-template-columns:230px 1fr 260px}}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <div class="brand"><span class="dot"></span>שלדת כלי הקטיף <small>לוח תכנון רכיבים</small></div>
+  <div class="seg" id="views">
+    <button data-v="3d" class="on">תלת־ממד</button><button data-v="side">צד</button><button data-v="top">מלמעלה</button><button data-v="front">חזית</button><button data-v="all">הכל</button>
+  </div>
+  <div class="seg" id="modes"><button data-m="design" class="on">עיצוב</button><button data-m="present">הצגה</button></div>
+  <span class="sp"></span>
+  <div id="sync" class="busy"><i></i><span>מתחבר…</span></div>
+  <button class="btn edit" id="bUndo" title="Ctrl+Z">↶ בטל</button>
+  <button class="btn edit" id="bRedo" title="Ctrl+Y">↷ חזור</button>
+  <button class="btn" id="bRules">חוקי הנדסה</button>
+  <button class="btn" id="bCompare">השוואה</button>
+  <button class="btn" id="bGh" style="display:none">חיבור לעריכה</button>
+  <button class="btn" id="bSave">שמור לקובץ</button>
+  <button class="btn edit" id="bLoad">טען מקובץ</button>
+  <input type="file" id="fileIn" accept=".json,application/json" hidden>
+</header>
+<main>
+  <aside id="compPanel">
+    <div class="ph"><h3>רכיבים</h3><span class="muted" id="compCount"></span></div>
+    <div id="compList"></div>
+  </aside>
+  <section id="center">
+    <div id="kpis"></div>
+    <div id="stage">
+      <canvas id="cv"></canvas>
+      <div id="stageTools"><button id="zIn" title="התקרב">+</button><button id="zOut" title="התרחק">−</button><button id="zFit" title="התאם למסך">⤢</button></div>
+      <div id="preview"><span id="pvText"></span><button class="btn pri" id="pvOk">אשר</button><button class="btn" id="pvNo">בטל</button></div>
+      <div id="tip"></div>
+      <div id="hint">גרירה של רכיב: הזזה · Shift+גרירה: למעלה/למטה · גרירה של הרקע: סיבוב · גלגלת: זום · כפתור ימני: הזזת מבט</div>
+    </div>
+    <div id="checks"></div>
+    <div id="selPanel"></div>
+  </section>
+  <aside id="ctrlPanel"></aside>
+</main>
+<footer id="tabs"></footer>
+</div>
+<div id="modal"><div id="mbox"></div></div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ================== utilities ================== */
+const $=s=>document.querySelector(s);
+const D=Math.PI/180;
+const clone=o=>JSON.parse(JSON.stringify(o));
+const uid=()=>Math.random().toString(36).slice(2,10);
+const r1=v=>Math.round(v*10)/10, r2=v=>Math.round(v*100)/100;
+const fmt=(v,d=1)=>(v==null||!isFinite(v))?'—':(+v).toFixed(d);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]], sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+const mul=(a,k)=>[a[0]*k,a[1]*k,a[2]*k], dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const len=a=>Math.hypot(a[0],a[1],a[2]), norm=a=>{const l=len(a)||1;return [a[0]/l,a[1]/l,a[2]/l]};
+
+const CAT={
+  chassis:{n:'שלדה',c:'#8d97a8'}, wheel:{n:'גלגלים',c:'#2d3037'}, power:{n:'חשמל',c:'#f6b73c'},
+  drive:{n:'הנעה',c:'#ff8a4c'}, compute:{n:'בקרה ומחשוב',c:'#2ec4b6'}, sensor:{n:'חיישנים',c:'#9b8cff'},
+  arm:{n:'זרוע וכלי קצה',c:'#e9e6e1'}, bin:{n:'ארגז',c:'#7bd389'}, safety:{n:'בטיחות',c:'#ff5a4e'}, charge:{n:'טעינה',c:'#4fb3ff'}
+};
+const CAT_ORDER=['arm','bin','power','compute','drive','sensor','charge','safety','wheel'];
+
+/* ================== default configuration (from the component list, 16.11.2026) ================== */
+function makeDefault(){
+  const ch={type:'ladder',L:90,FW:19,profW:4,profH:4,wall:0.2,mat:'steel',cross:3,plateT:0.5,clear:10,WB:66,axOff:0,wheelD:25.4,tireW:8,gap:2.5,susp:'rocker',pivX:0,maxArt:5.5,beamW:2};
+  const C=(o)=>Object.assign({id:uid(),locked:false,qty:1,wEst:false,pEst:false,fov:null,link:'',ip:'',note:'',rot:0},o);
+  const comps=[
+    C({key:'arm',name:'זרוע Kinova Gen3 lite',model:'Kinova Gen3 lite',cat:'arm',shape:'arm',L:11.5,W:11.5,H:24.3,x:-25.75,y:-3.5,z:14,mount:'top',weight:5.4,power:30,pEst:true,ip:'IP22',
+      link:'https://docs.clearpathrobotics.com/assets/files/clearpath_robotics_022586-TDS2-e371286ff4ca19bcebd345a43380ef0f.pdf',
+      note:'6 צירים, טווח 76, מטען 0.5 ק״ג. בסיס 24.3 (12.8 עד המפרק הראשון); זרוע עליונה 28; אמה 14; שורש כף יד 10.5+10.5; עד מרכז האוחז 13. בקר בתוך הבסיס. 21–30 וולט, עד 40°C. בסיס: 4 ברגי M6 על 4×4. צריכה ממוצעת: הנחה.'}),
+    C({key:'armcover',name:'מעטפת מגן לזרוע',model:'בנייה עצמית',cat:'arm',shape:'none',L:0,W:0,H:0,x:0,y:0,z:0,mount:'arm',weight:0.75,wEst:true,power:0,note:'משקל לא ידוע (הנחה 0.5–1.0 ק״ג). מחולק לאורך הזרוע בחישוב מרכז הכובד.'}),
+    C({key:'ee',name:'כלי קצה Fin-Ray + מספריים',model:'בנייה עצמית',cat:'arm',shape:'none',L:1.3,W:4.2,H:0.8,x:0,y:0,z:0,mount:'armtip',weight:0.25,wEst:true,power:0,note:'כל אצבע 1.3×4.2×0.8 (הנחה); פתיחה 3.8. על האוחז המקורי של Kinova (0.2 ק״ג).'}),
+    C({key:'d405',name:'מצלמת RealSense D405',model:'Intel RealSense D405',cat:'sensor',shape:'none',L:2.3,W:4.2,H:4.2,x:0,y:0,z:0,mount:'armtip',weight:0.06,power:1.5,pEst:true,link:'https://realsenseai.com/products/stereo-depth-camera-d405/',note:'על קצה הזרוע. עד 35°C.'}),
+    C({key:'ring',name:'תאורת טבעת Balluff',model:'Balluff BAE011T (BAE LX-VS-RW040)',cat:'sensor',shape:'none',L:1.3,W:4.05,H:4.05,x:0,y:0,z:0,mount:'armtip',weight:0.05,wEst:true,power:2.5,ip:'IP20',link:'https://www.balluff.com/en-us/products/BAE011T',note:'לבנה, 24 וולט, עד 104 mA (Boost עד 170). Trigger מובנה. IP20 – צריך חלון אטום. משקל לא פורסם (הנחה).'}),
+    C({key:'bin',name:'קופסת פלפלים 30 ליטר',model:'30 ליטר',cat:'bin',shape:'bin',L:40,W:39,H:24,x:25,y:0,z:40.7,mount:'free',weight:3,wEst:true,power:0,note:'חוץ כ־40×39×24; פנים 37×36×22.5. עד 10 ק״ג פלפלים. משקל ריק: הנחה.'}),
+    C({key:'loadcell',name:'חיישן משקל לקופסה',model:'HBK PW15iA, 50 ק״ג',cat:'sensor',shape:'box',L:15,W:4,H:3,x:25,y:0,z:37.7,ox:0,oy:0,mount:'bin',weight:0.4,wEst:true,power:0.5,pEst:true,ip:'IP68',link:'https://www.hbm.com/fileadmin/mediapool/hbmdoc/technical/b2553.pdf',note:'15×4×כ־3. דיגיטלי. יושב מתחת לקופסה וזז איתה.'}),
+    C({key:'actuator',name:'בוכנה חשמלית להטיית הארגז',model:'Progressive Automations PA-14-4-150-24VDC',cat:'drive',shape:'actuator',L:3,W:3,H:18,x:0,y:0,z:0,mount:'binact',weight:0.9,wEst:true,power:1,pEst:true,ip:'IP54',link:'https://www.mrosupply.com/linear-motion/6425832_pa-14-4-150-24vdc_mro-supply/',note:'מהלך 4 אינץ׳ (10.2). 24 וולט, כ־667 ניוטון. אורך סגור לא ידוע – 18 ס״מ הוא הנחה (ניתן לשנות בפאנל הארגז).'}),
+    C({key:'battery',name:'סוללה + פיוז ראשי',model:'Epoch Pro LiFePO4 24V 60Ah + Blue Sea MRBF 125A',cat:'power',shape:'box',L:31.1,W:22.9,H:17.1,x:-4.35,y:0,z:14,mount:'top',weight:13.7,power:0,ip:'IP67',link:'https://www.18650batterystore.com/products/24v-60ah-pro-series-lifepo4-battery-1-54kwh',note:'1,536 ווט־שעה, CAN/RS485. מותקנת שטוחה (גובה 17.1).'}),
+    C({key:'ebox',name:'קופסת אלקטרוניקה',model:'DDR-240B-24 · Jetson Orin NX על DSBOARD-ORNX · ZED-F9P · Finder 46.61 · 2× Moxa INJ-24-T',cat:'compute',shape:'box',L:31.7,W:11.95,H:5.6,x:-4.05,y:-5.47,z:31.1,mount:'top',weight:1.9,wEst:true,power:29,pEst:true,
+      note:'פנים כ־31.1×11.35×5 (דופן 0.3 – הנחה). בפנים: ממיר Mean Well DDR-240B-24 (12.5×11.35×4.0); Jetson Orin NX 16GB על Forecr DSBOARD-ORNX (10×10×3.4, 10–25W); u-blox ZED-F9P (4.3×4.3×1); ממסר Finder 46.61.9.024; 2× Moxa INJ-24-T (2.49×10×8.62, עד 4.08W כל אחד). צריכה: Jetson ~20W + Moxa 8.2W + שאר ~1W (הנחה).'}),
+    C({key:'roboteq',name:'בקר מנוע Roboteq',model:'Roboteq SBL2360T',cat:'drive',shape:'box',L:12.3,W:8.3,H:2.5,x:17.45,y:0,z:14,mount:'top',weight:0.215,power:2,pEst:true,ip:'IP40',link:'https://www.sgbotic.com/products/datasheets/roboteq/sbl23xx_datasheet.pdf',note:'2 ערוצים × 30A, STO. מחוץ לקופסת האלקטרוניקה.'}),
+    C({key:'roboteq',name:'בקר מנוע Roboteq',model:'Roboteq SBL2360T',cat:'drive',shape:'box',L:12.3,W:8.3,H:2.5,x:30.25,y:0,z:14,mount:'top',weight:0.215,power:2,pEst:true,ip:'IP40',link:'https://www.sgbotic.com/products/datasheets/roboteq/sbl23xx_datasheet.pdf',note:'2 ערוצים × 30A, STO.'}),
+    C({key:'lidar',name:'LiDAR',model:'Livox Mid-360',cat:'sensor',shape:'lidar',L:6.5,W:6.5,H:6,x:-46.565,y:0,z:29,mount:'rear',weight:0.465,wEst:true,power:6.5,ip:'IP67',link:'https://www.livoxtech.com/mid-360/specs',
+      fov:{type:'lidar',yaw:0,pitch:0,h:360,vmin:-7,vmax:52,range:100},note:'265 גרם + לוח מתכת 10×10 (משקל הלוח הנחה). זקוף, בקצה של הזרוע, צמוד מעל המצלמה האחורית, מרכז בגובה 32 (מינימום 30). שדה ראייה 360°×(‎−7°…+52°).'}),
+    C({key:'oak',name:'מצלמת עומק קדמית',model:'Luxonis OAK-D Pro W PoE',cat:'sensor',shape:'camera',L:3.13,W:11.1,H:4,x:46.565,y:0,z:13,mount:'front',weight:0.184,power:4,ip:'IP65',fov:{type:'cam',yaw:0,pitch:-15,h:127,v:79.5,range:40},note:'זיהוי מכשולים 0–40 ס״מ. גובה 15, הטיה 15° למטה. 127°×79.5°. PoE דרך Moxa.'}),
+    C({key:'oak',name:'מצלמת עומק אחורית',model:'Luxonis OAK-D Pro W PoE',cat:'sensor',shape:'camera',L:3.13,W:11.1,H:4,x:-46.565,y:0,z:13,mount:'rear',weight:0.184,power:4,ip:'IP65',fov:{type:'cam',yaw:180,pitch:-15,h:127,v:79.5,range:40},note:'זיהוי מכשולים מאחור. גובה 15, הטיה 15° למטה.'}),
+    C({key:'rtk',name:'אנטנת RTK על פלטה',model:'u-blox ANN-MB-00',cat:'sensor',shape:'antenna',L:15,W:15,H:2.25,x:-17.9,y:6.45,z:56.5,mount:'free',weight:0.45,wEst:true,power:0.1,pEst:true,ip:'IP67',link:'https://www.ardusimple.com/product/ann-mb-00-ip67',note:'8.2×6.0×2.25 על פלטת מתכת Ø15, פנים לשמיים, על תורן מעל הסוללה. גובה נמוך ככל האפשר כך שהשיחים (61), הארגז והזרוע המקופלת לא יחסמו לוויינים מעל 15° (≈56). הזרוע עוברת ליד התורן בדרך לארגז.'}),
+    C({key:'wsp',name:'משטח קליטה לטעינה (WSP)',model:'Delta MOOVair 01 24V',cat:'charge',shape:'disc',axis:'z',L:16,W:16,H:1.9,x:-11.35,y:0,z:8,mount:'belly',weight:1.0,wEst:true,power:0,ip:'IP65',link:'https://psu.deltaww.com/en/file/marketing_resources/Delta_1kWWCS_Standard_Flyer_EN_R3.0_13.03.2024660b87fd5ac5a.pdf',note:'Ø16×1.9 בגחון, מתחת ליחידת הקליטה, פונה לקרקע (התחנה = במה מתחת לכלי). מרווח מהתחנה 0–2 ס״מ. 1.5 ק״ג יחד עם WSB (החלוקה הנחה).'}),
+    C({key:'wsb',name:'יחידת קליטה לטעינה (WSB)',model:'Delta MOOVair 01 24V',cat:'charge',shape:'box',L:16.8,W:8.2,H:2.8,x:-11.35,y:0,z:11.2,mount:'free',weight:0.5,wEst:true,power:2,pEst:true,ip:'IP40',note:'מתחת לסוללה, בין קורות האורך. עד 41.7A, 1,000W, CAN לסוללה.'}),
+    C({key:'estop',name:'כפתור עצירת חירום',model:'IDEC XW1E-BV413M-R',cat:'safety',shape:'cyl',L:4,W:4,H:7,x:-10.9,y:-8.24,z:36.7,mount:'top',weight:0.15,wEst:true,power:0,ip:'IP65',link:'https://au.rs-online.com/web/p/emergency-stop-push-buttons/8337032',note:'ראש Ø4; חור Ø2.2; גוף מאחורי הדופן 4.87.'}),
+    C({key:'signal',name:'נורת התראה וזמזם',model:'Banner TL50BGYRALSQ',cat:'safety',shape:'cyl',L:5,W:5,H:20,x:-16.4,y:-8.24,z:36.7,mount:'top',weight:0.4,wEst:true,power:3,pEst:true,ip:'IP67',link:'https://www.ramcoi.com/itemdetail/TL50BGYRALSQ',note:'Ø5.0; גובה לא ידוע – 20 הוא הנחה. 4 צבעים + זמזם 85–101 dB.'}),
+    C({key:'wheel',name:'גלגל הנעה',model:'Lunyee 10″ off-road 24V',cat:'wheel',shape:'wheel',L:0,W:0,H:0,x:0,y:0,z:0,mount:'wheels',qty:4,weight:4,wEst:true,power:12,pEst:true,link:'https://lunyee.en.made-in-china.com/product/KtCrZwXlrAUD/China-10-Inch-48V-Brushless-Electric-Motor-Hub-Motor-with-off-Road-Tire.html',note:'Ø25.4×כ־8. 500W, 5:1, עד 100 נ״מ. משקל וצריכה ממוצעת לגלגל: הנחה.'})
+  ];
+  return {v:1,ch,comps,arm:{yaw:150,sh:45,el:154,wr:-100},
+    bin:{tilt:0,fill:0,dir:'front',actD:6,actY:0,actClosed:18,actStroke:10.2,actForce:667,slope:25,actAng:25,floorAng:25,floorPerp:true},
+    rules:defaultRules(),accepted:{}};
+}
+const RULES=[
+  ['maxWidth','רוחב כולל מקסימלי',40,'ס״מ','השביל הנקי בין הערוגות 40 ס״מ, והכלי כולל גלגלים צריך להיכנס בו.','החלטת הפרויקט: רוחב הכלי 40 כולל גלגלים'],
+  ['pathW','רוחב שביל',40,'ס״מ','קובע איפה מתחיל השיח משני הצדדים (חצי שביל מכל צד).','פרמטרי השדה: שביל נקי 40'],
+  ['bushH','גובה שיח מקסימלי',61,'ס״מ','הפרי הגבוה ביותר שהזרוע צריכה להגיע אליו.','פרמטרי השדה: שיח עד 61 (ממוצע 53)'],
+  ['lowFruit','גובה הפרי הנמוך',7.5,'ס״מ','הפרי הנמוך ביותר שהזרוע צריכה להגיע אליו.','פרמטרי השדה: פירות נמוכים ≈7.5'],
+  ['armDepth','עומק כניסה לשיח',15,'ס״מ','כמה עמוק בתוך השיח הזרוע צריכה להגיע מקצה השביל.','הנחה'],
+  ['minLat','זווית התהפכות צידית מינימלית',25,'°','שדה פתוח עם תלמים ושיפועים. מתחת לזה הכלי עלול להתהפך כשהזרוע פרושה לצד.','הנחה הנדסית'],
+  ['minLong','זווית התהפכות אורכית מינימלית',20,'°','בלימה, עלייה וירידה בקצות השורות.','הנחה הנדסית'],
+  ['minWheel','עומס מינימלי על גלגל',10,'%','גלגל עם מעט עומס מאבד אחיזה בפנייה בהחלקה (skid steer).','הנחה הנדסית'],
+  ['lidarMinH','גובה מינימלי למרכז LiDAR',30,'ס״מ','מעל ראש הגלגל ורואה את דופן השיח בגובה 29.5–57.6.','סיכום 18.11 סעיף 1.9'],
+  ['lidarRange','טווח בדיקת חסימה ל־LiDAR',100,'ס״מ','רכיבים בטווח הזה בתוך שדה הראייה נחשבים חוסמים.','הנחה'],
+  ['maxLidarBlock','חסימה מותרת של שדה LiDAR',15,'%','חלק משדה הראייה שהכלי עצמו מסתיר. מסכה בתוכנה אפשרית, אבל כל אחוז הוא מידע שאבד.','הנחה; לפי 1.11 הזרוע לבדה מסתירה כ־±55° קדימה'],
+  ['camRange','טווח בדיקת מצלמות',40,'ס״מ','המצלמות מזהות מכשולים 0–40 ס״מ מהכלי.','רשימת רכיבים: OAK-D Pro W'],
+  ['maxBlind','אזור עיוור מקסימלי לפני הכלי',15,'ס״מ','המרחק מקצה הכלי שבו המצלמה עוד לא רואה את הקרקע.','סיכום 18.11 סעיף 1.6: כ־11 ס״מ'],
+  ['rtkSky','זווית חסימה מותרת מעל אנטנת RTK',15,'°','אנטנת GNSS צריכה שמיים פתוחים. רכיב גבוה ליד האנטנה חוסם לוויינים.','הנחה (מקובל 10–15°)'],
+  ['minRun','זמן עבודה מינימלי',8,'שעות','בין טעינות. העבודה 24 שעות עם עצירות טעינה.','מסמך הכלי: ≈8–12 שעות'],
+  ['usable','ניצולת סוללה',90,'%','LiFePO4 – לא מרוקנים עד הסוף.','הנחה'],
+  ['losses','הפסדי המרה וכבלים',7,'%','ממיר DDR-240B ונפילות מתח.','הנחה'],
+  ['maxWeight','משקל מקסימלי (0 = ללא)',0,'ק״ג','אין כרגע מגבלה – הבדיקה רק מציגה את המשקל.',''],
+  ['maxPress','לחץ מקסימלי על הקרקע',40,'kPa','קרקע חקלאית רכה; לחץ גבוה דוחס את השביל ושוקע.','הנחה; מסמך הכלי: ≈32'],
+  ['contactL','אורך מגע צמיג בקרקע',10,'ס״מ','לחישוב שטח המגע (אורך × רוחב צמיג).','מסמך הכלי: 10×8'],
+  ['dumpAng','זווית פריקה',45,'°','הבוכנה מרימה את הארגז ל־45°.','רשימת רכיבים: PA-14'],
+  ['actMargin','מקדם ביטחון לכוח הבוכנה',1.5,'×','כוח הבוכנה מול המומנט של ארגז מלא לאורך כל ההטיה.','הנחה'],
+  ['dumpClear','בליטת שפת הפריקה מעבר לכלי',5,'ס״מ','הפלפלים צריכים ליפול מחוץ לכלי ולא על מצלמה או גלגל.','הנחה'],
+  ['wsbDist','מרחק מקסימלי WSB–WSP',40,'ס״מ','כבל קצר בין משטח הקליטה ליחידת הקליטה.','הנחה'],
+  ['padTol','מרווח טעינה מהתחנה',2,'ס״מ','המשטח חייב להיות הנקודה הבולטת ביותר בדופן שלו, אחרת התחנה לא תתקרב ל־0–2 ס״מ.','Delta MOOVair 01'],
+  ['estopH','גובה מינימלי לכפתור חירום',30,'ס״מ','צריך להיות נגיש ביד מבחוץ.','הנחה'],
+  ['minClear','מרווח גחון מינימלי',8,'ס״מ','גושי אדמה ושאריות צמחים בשביל.','הנחה'],
+  ['density','צפיפות פלפלים בתפזורת',0.45,'ק״ג/ל׳','להצגת גובה המילוי בארגז.','הנחה']
+];
+function defaultRules(){const o={};RULES.forEach(r=>o[r[0]]=r[2]);return o}
+
+/* ================== geometry ================== */
+const MAT={steel:{n:'פלדה',d:7.85},alu:{n:'אלומיניום',d:2.7}};
+const chTop=s=>s.ch.clear+(s.ch.type==='ladder'?s.ch.profH:s.ch.plateT);
+const axles=s=>({xf:s.ch.WB/2+s.ch.axOff,xr:-s.ch.WB/2+s.ch.axOff});
+const trackW=s=>s.ch.FW+2*s.ch.gap+s.ch.tireW;
+const totalWidthWheels=s=>s.ch.FW+2*(s.ch.gap+s.ch.tireW);
+const byKey=(s,k)=>s.comps.find(c=>c.key===k);
+const boxOf=c=>c._bb?{...c._bb}:({x0:c.x-c.L/2,x1:c.x+c.L/2,y0:c.y-c.W/2,y1:c.y+c.W/2,z0:c.z,z1:c.z+c.H});
+function binMountLocal(s,c,bin){ // box in the 'floor-flattened' frame: top touches the floor line through the hinge; along = distance from the hinge along the floor
+  const {hx,hz,sgn}=hingeOf(s), f=binFloorAng(s)*D, flen=(bin.L-binOff(s,bin))/Math.cos(f), act=(s.bin.actD||0)/Math.cos(f), half=c.L/2;
+  let al=act+1.5+1+half; if(al>flen-half-0.5) al=act-1.5-1-half; if(al<half+0.5) al=Math.max(half+0.5,Math.min(flen-half-0.5,flen/2));
+  al+=(c.ox||0); const cx=hx-sgn*al;
+  return {x0:cx-half,x1:cx+half,y0:bin.y+(c.oy||0)-c.W/2,y1:bin.y+(c.oy||0)+c.W/2,z0:hz-c.H,z1:hz}; }
+function boxCornersOf(b){const o=[];[b.x0,b.x1].forEach(x=>[b.y0,b.y1].forEach(y=>[b.z0,b.z1].forEach(z=>o.push([x,y,z]))));return o}
+function actHitsBinMount(s,c){ // exact test: piston (radius 1.6) against a box mounted under the tilted floor, in the floor frame
+  const bin=byKey(s,'bin'); if(!bin) return false; const lb=binMountLocal(s,c,bin), g=actGeom(s,0), inv=p=>rotBin(s,p,-binFloorAng(s)), r=1.6;
+  for(let k=0;k<=30;k++){ const t=k/30, q=inv([g.B[0]+(g.A0[0]-g.B[0])*t,g.B[1]+(g.A0[1]-g.B[1])*t,g.B[2]+(g.A0[2]-g.B[2])*t]);
+    if(q[0]>lb.x0-r&&q[0]<lb.x1+r&&q[1]>lb.y0-r&&q[1]<lb.y1+r&&q[2]>lb.z0-r&&q[2]<lb.z1-0.01) return true; } return false; }
+function binMountXf(s,th){ const f=binFloorAng(s); return p=>rotBin(s,p,f+(th||0)); }
+const physical=c=>!['arm','armtip','wheels'].includes(c.mount)&&c.shape!=='none';
+function overlap(a,b,e=0.05){return a.x0<b.x1-e&&b.x0<a.x1-e&&a.y0<b.y1-e&&b.y0<a.y1-e&&a.z0<b.z1-e&&b.z0<a.z1-e}
+function inBox(p,b,e=0){return p[0]>b.x0+e&&p[0]<b.x1-e&&p[1]>b.y0+e&&p[1]<b.y1-e&&p[2]>b.z0+e&&p[2]<b.z1-e}
+
+function resolve(s){ // derived positions
+  const bin=byKey(s,'bin');
+  s.comps.forEach(c=>{ if(c.mount==='bin'&&bin){ delete c._bb; const lb=binMountLocal(s,c,bin), xf=binMountXf(s,0); const P=boxCornersOf(lb).map(xf);
+    const bb={x0:Math.min(...P.map(q=>q[0])),x1:Math.max(...P.map(q=>q[0])),y0:lb.y0,y1:lb.y1,z0:Math.min(...P.map(q=>q[2])),z1:Math.max(...P.map(q=>q[2]))};
+    const cc=xf([(lb.x0+lb.x1)/2,(lb.y0+lb.y1)/2,(lb.z0+lb.z1)/2]); c.x=cc[0]; c.y=cc[1]; c.z=cc[2]-c.H/2;
+    Object.defineProperty(c,'_bb',{value:bb,enumerable:false,configurable:true,writable:true}); } });
+  const an=byKey(s,'rtk'), li=byKey(s,'lidar'); if(an&&li&&an.onLidar){an.x=li.x;an.y=li.y;}
+  const a=byKey(s,'actuator'); if(a&&bin){const g=actGeom(s,0);a.x=g.B[0];a.y=g.B[1];a.z=g.B[2];a.H=s.bin.actClosed;}
+}
+function binOff(s,b){b=b||byKey(s,'bin'); return Math.min(b.L*0.6,b.H*Math.tan((s.bin.slope||0)*D));} // how much shorter the floor is than the top, at the dump end
+function binSgn(s){return s.bin.dir==='front'?1:-1}
+function binFloorAng(s){return s.bin.floorPerp?(s.bin.actAng||0):(s.bin.floorAng||0)} // floor rises from the hinge toward the back wall
+function binRise(s,b){b=b||byKey(s,'bin'); return Math.min(b.H-4,(b.L-binOff(s,b))*Math.tan(binFloorAng(s)*D));}
+function binFloorZ(s,x,b){b=b||byKey(s,'bin'); const {hx,sgn}=hingeOf(s); const len=b.L-binOff(s,b); return b.z+Math.max(0,Math.min(len,sgn*(hx-x)))*binRise(s,b)/len;}
+function binFloor(s,b){b=b||byKey(s,'bin'); const sg=binSgn(s), off=binOff(s,b); const e0=b.x-sg*b.L/2, e1=b.x+sg*(b.L/2-off); return {x0:Math.min(e0,e1),x1:Math.max(e0,e1),cx:(e0+e1)/2,len:b.L-off}}
+function binProfile(s,b){ // side profile (x,z): back wall vertical, floor rising from the hinge to the back wall, dump-end wall sloped outward
+  b=b||byKey(s,'bin'); const sg=binSgn(s), off=binOff(s,b), r=binRise(s,b);
+  return [[b.x-sg*b.L/2,b.z+r],[b.x+sg*(b.L/2-off),b.z],[b.x+sg*b.L/2,b.z+b.H],[b.x-sg*b.L/2,b.z+b.H]]; }
+function inPoly2(q,pr,e=0){ let sgn0=0; for(let i=0;i<pr.length;i++){ const a=pr[i],c=pr[(i+1)%pr.length], ex=c[0]-a[0], ez=c[1]-a[1], L=Math.hypot(ex,ez)||1;
+  const cr=(ex*(q[1]-a[1])-ez*(q[0]-a[0]))/L; const sg=Math.sign(cr)||0; if(Math.abs(cr)<=e) return false; if(!sgn0) sgn0=sg; else if(sg!==sgn0) return false; } return true; }
+function inBin(s,p,e=0,b){ b=b||byKey(s,'bin'); if(p[1]<=b.y-b.W/2+e||p[1]>=b.y+b.W/2-e) return false;
+  if(e<0) e=0; return inPoly2([p[0],p[2]],binProfile(s,b),e); }
+function binPts(s,step=3,b){ b=b||byKey(s,'bin'); const bb={x0:b.x-b.L/2,x1:b.x+b.L/2,y0:b.y-b.W/2,y1:b.y+b.W/2,z0:b.z,z1:b.z+b.H};
+  const pts=boxPts(bb,step).filter(p=>inBin(s,p,0,b)); const pr=binProfile(s,b);
+  [b.y-b.W/2,b.y,b.y+b.W/2].forEach(y=>{ for(let i=0;i<4;i++){ const a=pr[i],c=pr[(i+1)%4]; for(let k=0;k<=8;k++){const t=k/8; pts.push([a[0]+(c[0]-a[0])*t,y,a[1]+(c[1]-a[1])*t]);} } }); return pts; }
+function clipBelow(pr,z){ const o=[]; for(let i=0;i<pr.length;i++){ const a=pr[i],c=pr[(i+1)%pr.length], ia=a[1]<=z, ic=c[1]<=z; if(ia) o.push(a); if(ia!==ic){const t=(z-a[1])/(c[1]-a[1]); o.push([a[0]+(c[0]-a[0])*t,z]);} } return o; }
+function polyArea(pr){let A=0; for(let i=0;i<pr.length;i++){const a=pr[i],c=pr[(i+1)%pr.length]; A+=a[0]*c[1]-c[0]*a[1];} return Math.abs(A)/2}
+function polyCent(pr){let A=0,cx=0,cz=0; for(let i=0;i<pr.length;i++){const a=pr[i],c=pr[(i+1)%pr.length],k=a[0]*c[1]-c[0]*a[1]; A+=k; cx+=(a[0]+c[0])*k; cz+=(a[1]+c[1])*k;} return A?[cx/(3*A),cz/(3*A)]:pr[0]}
+function binVol(s,b){b=b||byKey(s,'bin'); return polyArea(binProfile(s,b))*b.W/1000} // liters (outer)
+function hingeOf(s){const b=byKey(s,'bin');const sgn=binSgn(s);return {hx:b.x+sgn*(b.L/2-binOff(s,b)),hz:b.z,sgn,b}}
+function rotBin(s,p,th){ // rotate world point around bin hinge
+  const {hx,hz,sgn}=hingeOf(s); const dx=p[0]-hx,dz=p[2]-hz,c=Math.cos(th*D),sn=Math.sin(th*D);
+  return [hx+dx*c+sgn*dz*sn, p[1], hz-sgn*dx*sn+dz*c];
+}
+function actGeom(s,th){
+  const {hx,hz,sgn,b}=hingeOf(s); const ax=hx-sgn*s.bin.actD, ay=b.y+s.bin.actY;
+  const an=(s.bin.actAng||0)*D, Lc=s.bin.actClosed; // tilted like the sloped wall: top end leans toward the dump end
+  const A0=[ax,ay,binFloorZ(s,ax,b)]; const B=[ax-sgn*Lc*Math.sin(an),ay,A0[2]-Lc*Math.cos(an)];
+  return {A:rotBin(s,A0,th),A0,B};
+}
+function armBase(s){return byKey(s,'arm')}
+function fk(s,pose){
+  const A=armBase(s); const S=[A.x,A.y,A.z+24.3]; const u=[Math.cos(pose.yaw*D),Math.sin(pose.yaw*D),0];
+  const pt=(P,a,l)=>[P[0]+l*Math.sin(a*D)*u[0],P[1]+l*Math.sin(a*D)*u[1],P[2]+l*Math.cos(a*D)];
+  const a1=pose.sh,a2=a1+pose.el,a3=a2+pose.wr; const p1=pt(S,a1,28),p2=pt(p1,a2,35),p3=pt(p2,a3,13);
+  return {B:[A.x,A.y,A.z],S,p1,p2,p3,u,a3};
+}
+function ik(s,T,psis){
+  const A=armBase(s); if(!A) return null; const S=[A.x,A.y,A.z+24.3]; const dx=T[0]-S[0],dy=T[1]-S[1];
+  const r=Math.hypot(dx,dy), yaw=Math.atan2(dy,dx)/D, h=T[2]-S[2], l1=28,l2=35;
+  for(const psi of psis){
+    const rw=r-13*Math.cos(psi*D), hw=h-13*Math.sin(psi*D), d=Math.hypot(rw,hw);
+    if(d>l1+l2-0.05||d<Math.abs(l2-l1)+0.5) continue;
+    const g=Math.atan2(hw,rw), b=Math.acos(clamp((l1*l1+d*d-l2*l2)/(2*l1*d),-1,1)), t1=g+b;
+    const p1r=l1*Math.cos(t1),p1h=l1*Math.sin(t1), t2=Math.atan2(hw-p1h,rw-p1r);
+    const a1=90-t1/D,a2=90-t2/D,a3=90-psi; const pose={yaw:r1(yaw),sh:r1(a1),el:r1(a2-a1),wr:r1(a3-a2)};
+    const P=fk(s,pose); if(P.p1[2]<2||P.p2[2]<2) continue; return pose;
+  }
+  return null;
+}
+const PSI_PICK=[0,-15,15,-30,30,-45,-60,45], PSI_DROP=[-90,-75,-60,-45,-30,-15];
+function armTargets(s){
+  const A=armBase(s), R=s.rules; const yy=R.pathW/2+R.armDepth;
+  return [{k:'L-low',t:'שמאל – פרי נמוך',p:[A.x,yy,R.lowFruit]},{k:'L-high',t:'שמאל – פרי גבוה',p:[A.x,yy,R.bushH]},
+          {k:'R-low',t:'ימין – פרי נמוך',p:[A.x,-yy,R.lowFruit]},{k:'R-high',t:'ימין – פרי גבוה',p:[A.x,-yy,R.bushH]}];
+}
+function dropTarget(s){
+  const b=byKey(s,'bin'),A=armBase(s); const near=A.x<b.x?b.x-b.L/2+8:b.x+b.L/2-8; return [near,b.y,b.z+b.H+6];
+}
+function segPts(a,b,n){const o=[];for(let i=0;i<=n;i++)o.push(add(a,mul(sub(b,a),i/n)));return o}
+function armSample(s,pose){
+  const P=fk(s,pose); return [...segPts(P.S,P.p1,7),...segPts(P.p1,P.p2,9),...segPts(P.p2,P.p3,4)];
+}
+
+/* chassis members (for drawing, collisions and mass) */
+function chassisParts(s,art=0){
+  const c=s.ch, out=[], t=chTop(s), z0=c.clear;
+  const tube=(id,b,lab,kind='tube',axis='x')=>out.push({id,b,lab,kind,axis});
+  if(c.type==='ladder'){
+    const yr=c.FW/2-c.profW/2;
+    tube('ch-rail-l',{x0:-c.L/2,x1:c.L/2,y0:yr-c.profW/2,y1:yr+c.profW/2,z0,z1:t},'קורת אורך שמאל');
+    tube('ch-rail-r',{x0:-c.L/2,x1:c.L/2,y0:-yr-c.profW/2,y1:-yr+c.profW/2,z0,z1:t},'קורת אורך ימין');
+    const n=Math.max(2,c.cross|0); const yi=c.FW/2-c.profW;
+    for(let i=0;i<n;i++){const xc=-c.L/2+c.profW/2+i*(c.L-c.profW)/(n-1);
+      tube('ch-x'+i,{x0:xc-c.profW/2,x1:xc+c.profW/2,y0:-yi,y1:yi,z0,z1:t},'קורת רוחב','tube','y');}
+  } else {
+    out.push({id:'ch-plate',b:{x0:-c.L/2,x1:c.L/2,y0:-c.FW/2,y1:c.FW/2,z0,z1:t},lab:'פלטה',kind:'plate'});
+  }
+  const {xf,xr}=axles(s), R=c.wheelD/2;
+  if(rockerOn(s)){ const bw=c.beamW||2, {px,pz}=pivotOf(s);
+    [1,-1].forEach(sg=>{ const yi=c.FW/2+0.5, bz1=c.type==='plate'?Math.min(R-1,c.clear-0.2):R-1, b0={x0:xr-4,x1:xf+4,y0:sg>0?yi:-yi-bw,y1:sg>0?yi+bw:-yi,z0:bz1-3,z1:bz1};
+      out.push({id:'ch-beam'+(sg>0?'l':'r'),b0,rock:sg,b:aabbOf(boxCorners(b0).map(p=>rockPt(s,p,sg,art))),lab:'יחידת הנעה '+(sg>0?'שמאל':'ימין')+' (מתנדנדת)',kind:'tube',axis:'x'}); });
+    const yo=c.FW/2+0.5+bw; tube('ch-pivot',{x0:px-1.2,x1:px+1.2,y0:-yo,y1:yo,z0:pz-1.2,z1:pz+1.2},'ציר ארטיקולציה','tube','y');
+  } else {
+  [xf,xr].forEach((ax,i)=>[1,-1].forEach(sg=>{
+    out.push({id:'ch-br'+i+(sg>0?'l':'r'),b:{x0:ax-3,x1:ax+3,y0:sg>0?c.FW/2:-c.FW/2-c.gap,y1:sg>0?c.FW/2+c.gap:-c.FW/2,z0:Math.min(z0,R-3),z1:t},lab:'תושבת גלגל',kind:'plate'});
+  })); }
+  const bin=byKey(s,'bin');
+  if(bin){const {hx,sgn}=hingeOf(s); const top=bin.z; if(top>t+0.5){const yr=Math.min(c.FW/2,bin.W/2)-c.profW/2;
+    [1,-1].forEach(g=>tube('ch-hinge'+(g>0?'l':'r'),{x0:sgn>0?hx-c.profW:hx,x1:sgn>0?hx:hx+c.profW,y0:g*yr-c.profW/2,y1:g*yr+c.profW/2,z0:t,z1:top},'עמוד ציר לארגז','tube','z'));
+    const g=actGeom(s,0); if(g.B[2]>t+0.3) tube('ch-actbr',{x0:g.B[0]-2,x1:g.B[0]+2,y0:g.B[1]-2,y1:g.B[1]+2,z0:t,z1:g.B[2]},'תושבת בוכנה','tube','z');}}
+  const li=byKey(s,'lidar'); if(li&&li.z>t+0.5){ let pz=t; s.comps.forEach(o=>{ if(o===li||!physical(o)||o.key==='bin') return; const b=boxOf(o); if(li.x>b.x0&&li.x<b.x1&&li.y>b.y0&&li.y<b.y1&&b.z1<=li.z) pz=Math.max(pz,b.z1)});
+    tube('ch-lpost',{x0:li.x-1,x1:li.x+1,y0:li.y-1,y1:li.y+1,z0:pz,z1:li.z-0.3},'עמוד LiDAR','tube','z');
+    out.push({id:'ch-lplate',b:{x0:li.x-5,x1:li.x+5,y0:li.y-5,y1:li.y+5,z0:li.z-0.3,z1:li.z},lab:'לוח LiDAR 10×10',kind:'plate',nocol:true});}
+  const an=byKey(s,'rtk'); if(an&&an.z>t+0.5){ const onL=li&&Math.abs(an.x-li.x)<li.L/2&&Math.abs(an.y-li.y)<li.W/2&&an.z>li.z+li.H; let mz=t; if(!onL) s.comps.forEach(o=>{ if(o===an||!physical(o)||o.key==='bin') return; const b=boxOf(o); if(an.x>b.x0&&an.x<b.x1&&an.y>b.y0&&an.y<b.y1&&b.z1<=an.z) mz=Math.max(mz,b.z1)});
+    tube('ch-mast',{x0:an.x-1,x1:an.x+1,y0:an.y-1,y1:an.y+1,z0:onL?li.z+li.H:mz,z1:an.z},onL?'תורן אנטנה (על ה־LiDAR)':'תורן אנטנה','tube','z');}
+  s.comps.filter(k=>(k.mount==='front'||k.mount==='rear')&&k.key!=='lidar').forEach(k=>{
+    const sg=k.mount==='front'?1:-1, end=sg*c.L/2, inner=sg>0?k.x-k.L/2:k.x+k.L/2;
+    const x0=Math.min(end,inner),x1=Math.max(end,inner);
+    if(x1-x0>0.3) out.push({id:'ch-mb-'+k.id,b:{x0,x1,y0:k.y-2,y1:k.y+2,z0:Math.min(k.z+1,t-1),z1:Math.max(k.z+1,t)},lab:'תושבת '+k.name,kind:'plate',nocol:true});
+  });
+  return out;
+}
+function partMass(s,p){
+  const c=s.ch,d=MAT[c.mat].d, b=p.b, lx=b.x1-b.x0,ly=b.y1-b.y0,lz=b.z1-b.z0;
+  if(p.kind==='tube'){const L=p.axis==='x'?lx:p.axis==='y'?ly:lz; const a=p.axis==='x'?[ly,lz]:p.axis==='y'?[lx,lz]:[lx,ly];
+    const w=Math.min(c.wall,a[0]/2,a[1]/2); const area=a[0]*a[1]-(a[0]-2*w)*(a[1]-2*w); return area*L*d/1000;}
+  if(p.id==='ch-plate') return lx*ly*lz*d/1000;
+  return lx*ly*Math.min(lz,0.4)*d/1000*(p.id.startsWith('ch-br')?6:1); // brackets: thin plates
+}
+function suspHits(s,sol){ const m=s.ch.maxArt||12, hits=new Map(); resolve(s); sol=sol||solids(s);
+  for(const a of [-m,-m*0.75,-m/2,-m/4,m/4,m/2,m*0.75,m]){ const parts=[...wheelBoxes(s,a).map(w=>w.b),...chassisParts(s,a).filter(p=>p.rock).map(p=>beamHull(s,p,a))].flat();
+    parts.forEach(b=>sol.forEach(o=>{ if(o.kind!=='comp') return; if(overlap(b,o.b,0.1)) hits.set(o.compId,1) })); }
+  return hits; }
+function beamHull(s,p,a){ const b0=p.b0, n=6, out=[]; for(let i=0;i<n;i++){ const x0=b0.x0+(b0.x1-b0.x0)*i/n, x1=b0.x0+(b0.x1-b0.x0)*(i+1)/n; out.push(aabbOf(boxCorners({...b0,x0,x1}).map(q=>rockPt(s,q,p.rock,a)))); } return out; }
+const rockerOn=s=>s.ch.susp==='rocker';
+function pivotOf(s){const {xf,xr}=axles(s);return {px:(xf+xr)/2+(s.ch.pivX||0), pz:Math.min(s.ch.wheelD/2, chTop(s)-1.3)}}
+function rockPt(s,p,side,art){ if(!art||!rockerOn(s)) return p; const {px,pz}=pivotOf(s); const th=side*art*D, dx=p[0]-px, dz=p[2]-pz;
+  return [px+dx*Math.cos(th)-dz*Math.sin(th), p[1], pz+dx*Math.sin(th)+dz*Math.cos(th)]; }
+function aabbOf(pts){const b={x0:1e9,x1:-1e9,y0:1e9,y1:-1e9,z0:1e9,z1:-1e9};pts.forEach(p=>{b.x0=Math.min(b.x0,p[0]);b.x1=Math.max(b.x1,p[0]);b.y0=Math.min(b.y0,p[1]);b.y1=Math.max(b.y1,p[1]);b.z0=Math.min(b.z0,p[2]);b.z1=Math.max(b.z1,p[2])});return b}
+function boxCorners(b){return [[b.x0,b.y0,b.z0],[b.x1,b.y0,b.z0],[b.x1,b.y1,b.z0],[b.x0,b.y1,b.z0],[b.x0,b.y0,b.z1],[b.x1,b.y0,b.z1],[b.x1,b.y1,b.z1],[b.x0,b.y1,b.z1]]}
+function wheelBoxes(s,art=0){
+  const {xf,xr}=axles(s),R=s.ch.wheelD/2,tw=s.ch.tireW,yc=trackW(s)/2,o=[];
+  [['FL',xf,1],['FR',xf,-1],['RL',xr,1],['RR',xr,-1]].forEach(([n,x,g])=>{ const c=rockPt(s,[x,g*yc,R],g,art);
+    o.push({id:'wheel-'+n,x:c[0],y:g*yc,z:c[2],side:g,b:{x0:c[0]-R,x1:c[0]+R,y0:g*yc-tw/2,y1:g*yc+tw/2,z0:c[2]-R,z1:c[2]+R}}); });
+  return o;
+}
+function actBox(s){const g=actGeom(s,0);return {x0:Math.min(g.B[0],g.A0[0])-1.5,x1:Math.max(g.B[0],g.A0[0])+1.5,y0:g.B[1]-1.5,y1:g.B[1]+1.5,z0:g.B[2],z1:g.A0[2]}}
+function solids(s,opt={}){ // everything with a bounding box
+  const o=[];
+  chassisParts(s).forEach(p=>o.push({id:p.id,kind:'chassis',b:p.b,lab:p.lab,nocol:p.nocol}));
+  wheelBoxes(s).forEach(w=>o.push({id:w.id,kind:'wheel',b:w.b,lab:'גלגל',compId:byKey(s,'wheel')?.id}));
+  s.comps.forEach(c=>{ if(!physical(c)&&c.shape!=='arm') return;
+    if(c.shape==='actuator'){o.push({id:c.id,kind:'comp',b:actBox(s),lab:c.name,compId:c.id,c});return;}
+    if(c.shape==='arm'){o.push({id:c.id,kind:'comp',b:boxOf(c),lab:c.name,compId:c.id,c});return;}
+    if(c.shape==='bin'&&(s.bin.slope||0)>0){ const b=boxOf(c), f=binFloor(s,c), off=binOff(s,c), sg=binSgn(s), zm=(b.z0+b.z1)/2;
+      const xm=sg>0?f.x1+off/2:f.x0-off/2; o.push({id:c.id,kind:'comp',b:{...b,z1:zm,x0:sg>0?b.x0:xm,x1:sg>0?xm:b.x1},lab:c.name,compId:c.id,c});
+      o.push({id:c.id,kind:'comp',b:{...b,z0:zm},lab:c.name,compId:c.id,c}); return; }
+    o.push({id:c.id,kind:'comp',b:boxOf(c),lab:c.name,compId:c.id,c});
+  });
+  return o;
+}
+function boxPts(b,step=3){
+  const n=v=>Math.max(2,Math.min(14,Math.ceil(v/step)+1)), o=[];
+  const nx=n(b.x1-b.x0),ny=n(b.y1-b.y0),nz=n(b.z1-b.z0);
+  for(let i=0;i<nx;i++)for(let j=0;j<ny;j++)for(let k=0;k<nz;k++)
+    o.push([b.x0+(b.x1-b.x0)*i/(nx-1),b.y0+(b.y1-b.y0)*j/(ny-1),b.z0+(b.z1-b.z0)*k/(nz-1)]);
+  return o;
+}
+
+/* ================== mass, power, stability ================== */
+function massItems(s,ov={}){
+  resolve(s);
+  const items=[], pose=ov.pose||s.arm, fill=ov.fill!=null?ov.fill:s.bin.fill, tilt=ov.tilt!=null?ov.tilt:s.bin.tilt;
+  chassisParts(s).forEach(p=>{const b=p.b;items.push({m:partMass(s,p),p:[(b.x0+b.x1)/2,(b.y0+b.y1)/2,(b.z0+b.z1)/2],g:'chassis'})});
+  const wc=byKey(s,'wheel'); wheelBoxes(s).forEach(w=>items.push({m:wc?wc.weight:4,p:[w.x,w.y,s.ch.wheelD/2],g:'wheel'}));
+  const P=fk(s,pose), mid=(a,b)=>mul(add(a,b),.5);
+  const armW=s.comps.filter(c=>c.mount==='arm'||c.shape==='arm').reduce((a,c)=>a+c.weight,0);
+  const A=armBase(s);
+  if(A){ items.push({m:armW*0.4,p:[A.x,A.y,A.z+12],g:'arm'},{m:armW*0.3,p:mid(P.S,P.p1),g:'arm'},{m:armW*0.25,p:mid(P.p1,P.p2),g:'arm'},{m:armW*0.05,p:mid(P.p2,P.p3),g:'arm'}); }
+  s.comps.filter(c=>c.mount==='armtip').forEach(c=>items.push({m:c.weight,p:P.p3,g:'arm'}));
+  const bin=byKey(s,'bin');
+  s.comps.forEach(c=>{ if(c.mount==='arm'||c.mount==='armtip'||c.mount==='wheels'||c.shape==='arm'||c.shape==='none') return;
+    let p=[c.x,c.y,c.z+c.H/2];
+    if(c.shape==='actuator'){const g=actGeom(s,tilt);p=mid(g.A,g.B);}
+    else if(c.key==='bin'||c.mount==='bin') p=rotBin(s,p,tilt);
+    items.push({m:c.weight,p,g:c.cat});
+  });
+  if(bin&&fill>0){const h=fillH(s,fill), c2=polyCent(clipBelow(binProfile(s,bin),bin.z+0.8+h)); items.push({m:fill,p:rotBin(s,[c2[0],bin.y,c2[1]],tilt),g:'peppers'});}
+  return items;
+}
+function fillH(s,kg){const b=byKey(s,'bin'); const V=(kg/s.rules.density)*1000, pr=binProfile(s,b), iW=b.W-3; let lo=0,hi=b.H-1.5; if(V<=0) return 0;
+  for(let k=0;k<30;k++){const m=(lo+hi)/2; const v=polyArea(clipBelow(pr,b.z+0.8+m))*iW*0.9; if(v<V) lo=m; else hi=m;} return hi; }
+function cgOf(items){let m=0,x=0,y=0,z=0;items.forEach(i=>{m+=i.m;x+=i.m*i.p[0];y+=i.m*i.p[1];z+=i.m*i.p[2]});return {m,x:x/m,y:y/m,z:z/m}}
+function stability(s,cg){
+  const {xf,xr}=axles(s),t=trackW(s)/2;
+  const lat=Math.atan2(t-Math.abs(cg.y),cg.z)/D, lon=Math.atan2(Math.min(xf-cg.x,cg.x-xr),cg.z)/D;
+  const fs=clamp((cg.x-xr)/(xf-xr),0,1), ls=clamp((cg.y+t)/(2*t),0,1);
+  const wl={FL:cg.m*fs*ls,FR:cg.m*fs*(1-ls),RL:cg.m*(1-fs)*ls,RR:cg.m*(1-fs)*(1-ls)};
+  return {lat,lon,wl};
+}
+function powerOf(s){
+  let p=0; s.comps.forEach(c=>p+=(c.power||0)*(c.mount==='wheels'?(c.qty||4):1)); return p;
+}
+
+/* ================== checks ================== */
+function compute(s0){
+  const s=clone(s0); resolve(s); const R=s.rules, out={checks:[],kpi:{}};
+  const sol=solids(s); const items=massItems(s); const cg=cgOf(items); const st=stability(s,cg);
+  const cTop=chTop(s); const name=id=>{const c=s.comps.find(c=>c.id===id);return c?c.name:(sol.find(o=>o.id===id)?.lab||id)};
+  const addCheck=(id,n,why,src,issues,detail)=>out.checks.push({id,n,why,src,issues,detail,status:issues.length?(s.accepted[id]!=null?'acc':'bad'):'ok'});
+
+  // 1 fit
+  { const iss=[], cs=sol.filter(o=>!o.nocol);
+    for(let i=0;i<cs.length;i++)for(let j=i+1;j<cs.length;j++){const a=cs[i],b=cs[j];
+      if(a.kind!=='comp'&&b.kind!=='comp') continue;
+      const ck=[a.c?.key,b.c?.key]; if(ck.includes('bin')&&(ck.includes('loadcell')||ck.includes('actuator'))) continue;
+      if(a.c?.key==='actuator'&&b.id==='ch-actbr'||b.c?.key==='actuator'&&a.id==='ch-actbr') continue;
+      if(a.c&&b.c&&[a.c.mount,b.c.mount].includes('bin')&&[a.c.shape,b.c.shape].includes('actuator')&&!actHitsBinMount(s,a.c.mount==='bin'?a.c:b.c)) continue;
+      if(overlap(a.b,b.b)){const mv=[a,b].filter(o=>o.kind==='comp'&&!o.c.locked&&!['bin','loadcell','actuator'].includes(o.c.key)).sort((p,q)=>vol(p.b)-vol(q.b))[0];
+        iss.push({t:`${a.lab} חופף ל־${b.lab}`,ids:[a.compId,b.compId].filter(Boolean),fix:mv?{l:`הזז את ${mv.lab} לנקודה פנויה`,f:st2=>{const c=st2.comps.find(c=>c.id===mv.compId);const p=freeSpot(st2,c,c.x,c.y);if(p){c.x=p.x;c.y=p.y;c.z=p.z;}}}:null});}
+    }
+    const fx=[-s.ch.L/2,s.ch.L/2];
+    s.comps.filter(c=>c.mount==='top'&&physical(c)||c.shape==='arm').forEach(c=>{const b=boxOf(c);
+      const onCh=c.x>fx[0]&&c.x<fx[1]&&Math.abs(c.y)<s.ch.FW/2; const supp=Math.abs(c.z-cTop)<0.3||s.comps.some(o=>o!==c&&physical(o)&&Math.abs(boxOf(o).z1-c.z)<0.3&&overlap({...b,z0:c.z-1,z1:c.z+1},{...boxOf(o),z0:c.z-1,z1:c.z+1}));
+      if(!onCh&&Math.abs(c.z-cTop)<0.3) iss.push({t:`${c.name} יוצא מגבולות השלדה (מרכזו לא נשען עליה)`,ids:[c.id],fix:{l:'הגדל את השלדה כדי להכיל את כל הרכיבים',f:st2=>fitChassis(st2,false)}});
+      else if(!supp) iss.push({t:`${c.name} מרחף – אין מתחתיו שלדה או רכיב`,ids:[c.id],fix:{l:'הורד אותו עד למשטח',f:st2=>{const k=st2.comps.find(k=>k.id===c.id);k.z=supportZ(st2,k)}}});
+    });
+    addCheck('fit','התאמה וחפיפות','רכיבים שחופפים זה לזה או לשלדה לא יכולים להיבנות כך. כל רכיב שיושב על השלדה צריך משטח מתחתיו.','גיאומטריה של הרכיבים (מידות מרשימת הרכיבים)',iss);
+  }
+  // 2 width
+  { let y0=0,y1=0,x0=0,x1=0,z1=0; sol.forEach(o=>{y0=Math.min(y0,o.b.y0);y1=Math.max(y1,o.b.y1);x0=Math.min(x0,o.b.x0);x1=Math.max(x1,o.b.x1);z1=Math.max(z1,o.b.z1)});
+    const W=y1-y0; out.kpi.W=W;out.kpi.Lt=x1-x0;out.kpi.Ht=z1; const iss=[];
+    if(W>R.maxWidth+0.05){const wide=sol.filter(o=>o.b.y1>R.maxWidth/2||o.b.y0<-R.maxWidth/2).map(o=>o.lab);
+      iss.push({t:`רוחב כולל ${fmt(W)} ס״מ – יותר מ־${R.maxWidth}. בולטים: ${[...new Set(wide)].join(', ')}`,ids:sol.filter(o=>o.b.y1>R.maxWidth/2||o.b.y0<-R.maxWidth/2).map(o=>o.compId).filter(Boolean),
+        fix:{l:`הקטן את רוחב השלדה כך שהגלגלים ייכנסו ב־${R.maxWidth}`,f:st2=>{st2.ch.FW=Math.max(8,R.maxWidth-2*(st2.ch.gap+st2.ch.tireW))}}});}
+    addCheck('width','רוחב ומעבר בשורה','הכלי נוסע בשביל נקי בין שתי ערוגות. כל ס״מ מעבר לרוחב השביל פוגע בשיחים.','פרמטרי השדה',iss);
+  }
+  // 3 CG & stability (current + worst cases)
+  { const sc=[{n:'מצב נוכחי',ov:{}}]; const tl=armTargets(s);
+    tl.forEach(t=>{const p=ik(s,t.p,PSI_PICK); if(p) sc.push({n:'ארגז מלא, זרוע '+t.t,ov:{pose:p,fill:10}})});
+    sc.push({n:'פריקה: ארגז מלא מוטה ל־'+R.dumpAng+'°',ov:{fill:10,tilt:R.dumpAng}});
+    const res=sc.map(x=>{const c=cgOf(massItems(clone(s),x.ov));return {...x,cg:c,st:stability(s,c)}});
+    const iss=[], minLat=Math.min(...res.map(r=>r.st.lat)), minLon=Math.min(...res.map(r=>r.st.lon));
+    const wLat=res.find(r=>r.st.lat===minLat), wLon=res.find(r=>r.st.lon===minLon);
+    const fixBat={l:'הזז את הסוללה למרכז בין הצירים ולמרכז הרוחב',f:st2=>{const b=byKey(st2,'battery');const {xf,xr}=axles(st2);const p=freeSpot(st2,b,(xf+xr)/2,0);if(p){b.x=p.x;b.y=p.y;b.z=p.z}}};
+    if(minLat<R.minLat) iss.push({t:`זווית התהפכות צידית ${fmt(minLat)}° (${wLat.n}) – פחות מ־${R.minLat}°`,ids:[byKey(s,'battery')?.id,byKey(s,'arm')?.id].filter(Boolean),fix:{l:'הרחב את המרחק בין הגלגלים עד הרוחב המותר',f:st2=>{st2.ch.FW=Math.max(st2.ch.FW,R.maxWidth-2*(st2.ch.gap+st2.ch.tireW))}}});
+    if(minLon<R.minLong) iss.push({t:`זווית התהפכות אורכית ${fmt(minLon)}° (${wLon.n}) – פחות מ־${R.minLong}°`,ids:[byKey(s,'battery')?.id,byKey(s,'bin')?.id].filter(Boolean),fix:fixBat});
+    const tot=cg.m, minW=Math.min(...Object.values(st.wl)); if(minW/tot*100<R.minWheel) iss.push({t:`הגלגל הכי פחות עמוס נושא ${fmt(minW/tot*100,0)}% מהמשקל`,ids:[byKey(s,'battery')?.id].filter(Boolean),fix:fixBat});
+    if(cg.x<axles(s).xr||cg.x>axles(s).xf) iss.push({t:'מרכז הכובד מחוץ לבסיס הגלגלים',ids:[byKey(s,'battery')?.id].filter(Boolean),fix:fixBat});
+    out.stab={res,minLat,minLon};
+    addCheck('cg','מרכז כובד ויציבות','מרכז כובד נמוך וקרוב למרכז = כלי יציב. נבדק גם במקרים הקשים: ארגז מלא עם זרוע פרושה לכל צד, ופריקה בהטיה מלאה.','חישוב סטטי מהמשקלים; ספים הם הנחה הנדסית',iss,
+      res.map(r=>`${r.n}: צידי ${fmt(r.st.lat)}° · אורכי ${fmt(r.st.lon)}° · גובה מ״כ ${fmt(r.cg.z)}`));
+  }
+  // 4 sensors
+  { const iss=[], det=[]; const li=byKey(s,'lidar'); out.lidar=null;
+    if(li){ const c=[li.x,li.y,li.z+li.H/2]; const f=li.fov; const NA=180,NE=20; const grid=new Uint8Array(NA*NE); const by={};
+      const mark=(p,id)=>{const d=sub(p,c),hd=Math.hypot(d[0],d[1]); if(hd<3||hd>f.range) return; const el=Math.atan2(d[2],hd)/D; if(el<f.vmin-2||el>f.vmax+2) return;
+        const az=(Math.atan2(d[1],d[0])/D+360)%360; const spread=Math.atan2(2.2,hd)/D;
+        for(let a=az-spread;a<=az+spread;a+=1.5){for(let e=el-spread;e<=el+spread;e+=1.5){ if(e<f.vmin||e>f.vmax) continue;
+          const ia=((Math.floor(((a%360)+360)%360/2))%NA), ie=Math.min(NE-1,Math.floor((e-f.vmin)/(f.vmax-f.vmin)*NE)); const k=ia*NE+ie; if(!grid[k]){grid[k]=1;by[id]=(by[id]||0)+1}}}};
+      sol.forEach(o=>{ if(o.compId===li.id||o.id==='ch-lpost'||o.id==='ch-lplate') return; boxPts(o.b,2.5).forEach(p=>mark(p,o.compId||o.id)); });
+      const arm=armBase(s); if(arm) armSample(s,s.arm).forEach(p=>{[[0,0,0],[0,0,3.5],[0,0,-3.5]].forEach(q=>mark(add(p,q),arm.id))});
+      let blocked=0; grid.forEach(v=>blocked+=v); const pct=blocked/(NA*NE)*100; const cols=[];
+      for(let ia=0;ia<NA;ia++){let n=0;for(let ie=0;ie<NE;ie++)n+=grid[ia*NE+ie];cols.push(n/NE)}
+      out.lidar={c,grid,NA,NE,cols,pct,by};
+      const tops=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([id,n])=>`${name(id)} ${fmt(n/(NA*NE)*100,1)}%`);
+      det.push(`LiDAR: ${fmt(pct,1)}% משדה הראייה מוסתר ע״י הכלי. מסתירים עיקריים: ${tops.join(' · ')||'אין'}`);
+      if(pct>R.maxLidarBlock) iss.push({t:`LiDAR מוסתר ב־${fmt(pct,1)}% (מותר ${R.maxLidarBlock}%). הכי מסתירים: ${tops.slice(0,3).join(', ')}`,ids:[li.id,...Object.entries(by).sort((a,b)=>b[1]-a[1]).map(e=>e[0]).filter(id=>s.comps.some(c=>c.id===id)).slice(0,2)],fix:null});
+      const h=li.z+li.H/2; det.push(`גובה מרכז LiDAR ${fmt(h)} ס״מ; רואה דופן שיח ב־20 ס״מ בגבהים ${fmt(h-2.5)}–${fmt(h+25.6)}; קרקע מ־${fmt(h/Math.tan(7*D)/100,2)} מ׳`);
+      if(h<R.lidarMinH) iss.push({t:`מרכז LiDAR בגובה ${fmt(h)} – מתחת ל־${R.lidarMinH}`,ids:[li.id],fix:{l:'הרם את ה־LiDAR ל־32 ס״מ',f:st2=>{const l=byKey(st2,'lidar');l.z=32-l.H/2}}});
+    }
+    out.cams=[];
+    s.comps.filter(c=>c.fov&&c.fov.type==='cam').forEach(cam=>{
+      const f=cam.fov, P=[cam.x,cam.y,cam.z+cam.H/2], fw=[Math.cos(f.yaw*D)*Math.cos(f.pitch*D),Math.sin(f.yaw*D)*Math.cos(f.pitch*D),Math.sin(f.pitch*D)];
+      const rt=norm(cross(fw,[0,0,1])), up=cross(rt,fw); const hit={};
+      const test=(p,id)=>{const d=sub(p,P),z=dot(d,fw); if(z<=0.5||len(d)>f.range) return; const ax=Math.atan2(dot(d,rt),z)/D, ay=Math.atan2(dot(d,up),z)/D;
+        if(Math.abs(ax)<=f.h/2&&Math.abs(ay)<=f.v/2) hit[id]=1};
+      sol.forEach(o=>{ if(o.compId===cam.id||o.id==='ch-mb-'+cam.id) return; boxPts(o.b,2).forEach(p=>test(p,o.compId||o.id)) });
+      const arm=armBase(s); if(arm) armSample(s,s.arm).forEach(p=>test(p,arm.id));
+      const lowAng=-f.pitch+f.v/2; const h=P[2]; const gd=lowAng>0?h/Math.tan(lowAng*D):Infinity;
+      const dirx=Math.cos(f.yaw*D), diry=Math.sin(f.yaw*D); let endExt=0;
+      sol.forEach(o=>{ if(o.kind==='chassis'&&o.nocol) return; const pts=[[o.b.x0,o.b.y0],[o.b.x1,o.b.y1],[o.b.x0,o.b.y1],[o.b.x1,o.b.y0]]; pts.forEach(q=>{const e=(q[0]-P[0])*dirx+(q[1]-P[1])*diry; endExt=Math.max(endExt,e)})});
+      const blind=gd-endExt; out.cams.push({id:cam.id,P,fw,rt,up,f,blind,gd,hit:Object.keys(hit)});
+      det.push(`${cam.name}: קרן תחתונה פוגעת בקרקע ${fmt(gd)} ס״מ מהעדשה; אזור עיוור מקצה הכלי ${fmt(Math.max(0,blind))} ס״מ`);
+      const hk=Object.keys(hit); if(hk.length) iss.push({t:`${cam.name}: ${hk.map(name).join(', ')} בתוך שדה הראייה (עד ${f.range} ס״מ)`,ids:[cam.id,...hk.filter(id=>s.comps.some(c=>c.id===id))],fix:null});
+      if(blind>R.maxBlind) iss.push({t:`${cam.name}: אזור עיוור ${fmt(blind)} ס״מ לפני הכלי (מותר ${R.maxBlind})`,ids:[cam.id],fix:{l:'הגדל את הטיית המצלמה ל־25° למטה',f:st2=>{st2.comps.find(c=>c.id===cam.id).fov.pitch=-25}}});
+    });
+    const an=byKey(s,'rtk');
+    if(an){ const P=[an.x,an.y,an.z+an.H]; const sk=rtkSkyOf(s,sol), worst=sk.worst, wn=sk.wn;
+      det.push(`אנטנת RTK בגובה ${fmt(P[2])}: החסימה הגבוהה ביותר ${worst<0?'מתחת לאופק':fmt(worst)+'° ('+(wn==='__bush'?'השיחים':name(wn))+')'}`);
+      if(worst>R.rtkSky) iss.push({t:`${wn==='__bush'?'השיחים':name(wn)} חוסמים את השמיים מעל אנטנת RTK בזווית ${fmt(worst)}° (מותר ${R.rtkSky}°)`,ids:[an.id,wn].filter(id=>s.comps.some(c=>c.id===id)),fix:{l:'הרם את האנטנה לגובה המינימלי שעובר את הבדיקה',f:st2=>{const a=byKey(st2,'rtk');a.z=minRtkZ(st2,a.x,a.y)}}});
+      else if(an.z-minRtkZ(clone(s),an.x,an.y)>3) det.push(`אפשר להנמיך את האנטנה עד ${fmt(minRtkZ(clone(s),an.x,an.y))} ס״מ בלי לעבור את זווית החסימה המותרת`);
+    }
+    addCheck('sensors','חיישנים ושדות ראייה','חלק מהכלי שנכנס לשדה הראייה מסתיר מידע: LiDAR לא רואה את דופן השיח, מצלמה רואה את הכלי עצמו במקום מכשול, אנטנה מאבדת לוויינים.','Livox Mid-360, Luxonis OAK-D Pro W, u-blox ANN-MB-00; סיכום 18.11',iss,det);
+  }
+  // 5 arm reach
+  { const iss=[],det=[]; const A=armBase(s); out.reach=[];
+    if(A){ armTargets(s).forEach(t=>{const p=ik(s,t.p,PSI_PICK); out.reach.push({...t,ok:!!p,pose:p}); det.push(`${t.t} (${fmt(Math.abs(t.p[1]))} מהמרכז, גובה ${t.p[2]}): ${p?'מגיעה':'לא מגיעה'}`);
+        if(!p) iss.push({t:`הזרוע לא מגיעה ל${t.t}`,ids:[A.id],fix:null})});
+      const dt=dropTarget(s), dp=ik(s,dt,PSI_DROP); out.reach.push({k:'drop',t:'שחרור לארגז',p:dt,ok:!!dp,pose:dp}); det.push(`שחרור לתוך הארגז: ${dp?'מגיעה':'לא מגיעה'}`);
+      if(!dp) iss.push({t:'הזרוע לא מגיעה לפתח הארגז כדי לשחרר פלפל',ids:[A.id,byKey(s,'bin').id],fix:{l:'קרב את הארגז לזרוע',f:st2=>{const b=byKey(st2,'bin'),a=armBase(st2);b.x+= (a.x<b.x?-1:1)*Math.min(15,Math.abs(b.x-a.x)-b.L/2)}}});
+      const pts=armSample(s,s.arm); const hitIds=new Set(); pts.slice(3).forEach(p=>sol.forEach(o=>{if(o.compId===A.id) return; if(inBox(p,o.b,0.2)) hitIds.add(o.compId||o.id)})); pts.forEach(p=>{if(p[2]<0)hitIds.add('ground')});
+      if(hitIds.size) iss.push({t:`בתנוחה הנוכחית הזרוע עוברת דרך: ${[...hitIds].map(i=>i==='ground'?'הקרקע':name(i)).join(', ')}`,ids:[A.id,...[...hitIds].filter(id=>s.comps.some(c=>c.id===id))],fix:{l:'קפל את הזרוע',f:st2=>{st2.arm=restPose(st2)}}});
+    }
+    addCheck('arm','טווח הזרוע','הזרוע (טווח 76 ס״מ) צריכה להגיע לפרי הנמוך והגבוה בשני צידי השביל, ובחזרה לפתח הארגז – בלי לעבור דרך רכיבים.','Kinova Gen3 lite; פרמטרי השדה',iss,det);
+  }
+  // 6 dump
+  { const iss=[],det=[]; const b=byKey(s,'bin');
+    if(b){ const th=R.dumpAng; const bb={x0:b.x-b.L/2,x1:b.x+b.L/2,y0:b.y-b.W/2,y1:b.y+b.W/2,z0:b.z,z1:b.z+b.H};
+      const pts=binPts(s,3,b).map(p=>rotBin(s,p,th)); const hits=new Set();
+      sol.forEach(o=>{ if(o.compId===b.id||o.c?.key==='loadcell'||o.c?.key==='actuator'||o.id.startsWith('ch-hinge')||o.id==='ch-actbr') return; if(pts.some(p=>inBox(p,o.b,0.3))) hits.add(o.compId||o.id)});
+      armSample(s,s.arm).forEach(p=>{ /* arm vs tilted bin */ const q=rotBin(s,p,-th); if(inBin(s,q,0.5,b)) hits.add(armBase(s).id)});
+      if(hits.size) iss.push({t:`בהטיה ל־${th}° הארגז פוגע ב: ${[...hits].map(name).join(', ')}`,ids:[b.id,...[...hits].filter(id=>s.comps.some(c=>c.id===id))],fix:null});
+      let need=0,minM=Infinity; const g0=actGeom(s,0); const L0=len(sub(g0.A,g0.B));
+      const binM=b.weight+10; const {hx,hz}=hingeOf(s);
+      for(let t=0;t<=th;t+=3){ const g=actGeom(s,t); const Lt=len(sub(g.A,g.B)); need=Math.max(need,Lt-L0);
+        const pc=polyCent(binProfile(s,b)), com=rotBin(s,[pc[0],b.y,pc[1]],t); const arm=Math.abs(com[0]-hx); const Tg=binM*9.81*arm/100;
+        const dir=norm(sub(g.A,g.B)); const r=sub(g.A,[hx,g.A[1],hz]); const Ta=Math.abs(r[0]*dir[2]-r[2]*dir[0])/100*s.bin.actForce;
+        minM=Math.min(minM,Ta/Math.max(Tg,1e-6)); }
+      out.dump={need,minM};
+      det.push(`מהלך נדרש ל־${th}°: ${fmt(need)} ס״מ (יש ${s.bin.actStroke}). יחס כוח מינימלי (ארגז מלא): ${fmt(minM,2)}×`);
+      const fixAct={l:'חשב מחדש את מרחק הבוכנה מהציר',f:st2=>{for(let d=2;d<=30;d+=0.5){st2.bin.actD=d;const c=compute(st2);if(c.dump.need<=st2.bin.actStroke&&c.dump.minM>=st2.rules.actMargin)return}}};
+      if(need>s.bin.actStroke+0.01) iss.push({t:`הבוכנה צריכה מהלך ${fmt(need)} ס״מ – יותר מ־${s.bin.actStroke}`,ids:[byKey(s,'actuator')?.id],fix:fixAct});
+      if(minM<R.actMargin) iss.push({t:`כוח הבוכנה מספיק רק פי ${fmt(minM,2)} מהנדרש (צריך ${R.actMargin}×)`,ids:[byKey(s,'actuator')?.id],fix:fixAct});
+      const lip=rotBin(s,[b.x+hingeOf(s).sgn*b.L/2,b.y,b.z+b.H],th)[0]; const sgn=hingeOf(s).sgn; let ext=sgn>0?-1e9:1e9;
+      sol.forEach(o=>{ if(o.compId===b.id||o.c?.key==='loadcell') return; ext=sgn>0?Math.max(ext,o.b.x1):Math.min(ext,o.b.x0)});
+      const over=(lip-ext)*sgn; det.push(`שפת הפריקה בולטת ${fmt(over)} ס״מ מעבר לקצה הכלי`);
+      if(over<R.dumpClear) iss.push({t:`הפלפלים ייפלו על הכלי: שפת הפריקה רק ${fmt(over)} ס״מ מעבר לקצה (צריך ${R.dumpClear})`,ids:[b.id,...sol.filter(o=>o.compId&&o.compId!==b.id&&(sgn>0?o.b.x1:-o.b.x0)>lip*sgn-R.dumpClear).map(o=>o.compId)],fix:{l:'הזז את הארגז לכיוון הפריקה',f:st2=>{const bn=byKey(st2,'bin');bn.x+=sgn*(R.dumpClear-over+1)}}});
+    }
+    addCheck('dump','הטיית הארגז','בפריקה הארגז מסתובב סביב ציר בקצה. הוא לא יכול לפגוע ברכיבים, הבוכנה צריכה מספיק מהלך וכוח, והפלפלים צריכים ליפול מחוץ לכלי.','PA-14 (מהלך 10.2, 667 ניוטון); אורך סגור – הנחה',iss,det);
+  }
+  // 7 power
+  { const P=powerOf(s), bat=byKey(s,'battery'); const cap=bat?1536:0; const run=cap*R.usable/100/(P*(1+R.losses/100));
+    out.kpi.P=P; out.kpi.run=run; const iss=[];
+    if(!(run>=R.minRun)) iss.push({t:`זמן עבודה ${fmt(run)} שעות – פחות מ־${R.minRun}`,ids:[bat?.id].filter(Boolean),fix:null});
+    addCheck('power','סוללה וזמן עבודה','1,536 ווט־שעה מחולקים בצריכה הממוצעת של כל הרכיבים (הערכים המסומנים כהנחה ניתנים לשינוי בפרטי כל רכיב).','Epoch 24V 60Ah; צריכות מרשימת הרכיבים',iss,
+      [`צריכה ממוצעת ${fmt(P,0)} ואט · זמן עבודה ${fmt(run)} שעות`]);
+  }
+  // 8 weight
+  { const iss=[]; const tw=s.ch.tireW, area=R.contactL*tw/1e4; const maxW=Math.max(...Object.values(st.wl)); const pr=maxW*9.81/area/1000;
+    out.kpi.press=pr; if(R.maxWeight>0&&cg.m>R.maxWeight) iss.push({t:`משקל ${fmt(cg.m)} ק״ג – יותר מ־${R.maxWeight}`,ids:[],fix:null});
+    if(pr>R.maxPress) iss.push({t:`לחץ על הקרקע ${fmt(pr)} kPa בגלגל העמוס – יותר מ־${R.maxPress}`,ids:[],fix:null});
+    const chM=items.filter(i=>i.g==='chassis').reduce((a,i)=>a+i.m,0); out.kpi.chM=chM;
+    addCheck('weight','משקל ועומס על הקרקע','משקל כולל, ולחץ של הגלגל העמוס ביותר על הקרקע.','משקלים מרשימת הרכיבים; שלדה מחושבת מהפרופיל',iss,
+      [`משקל כולל ${fmt(cg.m)} ק״ג (שלדה ${fmt(chM,2)}) · עומס גלגלים: ${Object.entries(st.wl).map(([k,v])=>k+' '+fmt(v)).join(' · ')}`]);
+  }
+  // 9 charging
+  { const iss=[],det=[]; const pad=byKey(s,'wsp'), li=byKey(s,'lidar'), wsb=byKey(s,'wsb');
+    if(pad&&pad.axis==='z'){ const fp={x0:pad.x-pad.L/2-R.padTol,x1:pad.x+pad.L/2+R.padTol,y0:pad.y-pad.W/2-R.padTol,y1:pad.y+pad.W/2+R.padTol};
+      const below=sol.filter(o=>o.compId!==pad.id&&o.b.z0<pad.z-0.05&&o.b.x0<fp.x1&&o.b.x1>fp.x0&&o.b.y0<fp.y1&&o.b.y1>fp.y0);
+      if(below.length) iss.push({t:`מתחת למשטח הטעינה יש ${below.map(o=>o.lab).join(', ')} – הם יפגעו בבמת הטעינה`,ids:[pad.id,...below.map(o=>o.compId).filter(Boolean)],fix:null});
+      if(wsb){const d=Math.hypot(wsb.x-pad.x,wsb.y-pad.y,(wsb.z+wsb.H/2)-(pad.z+pad.H/2)); det.push(`מרחק WSB–WSP ${fmt(d)} ס״מ`); if(d>R.wsbDist) iss.push({t:`WSB רחוק ${fmt(d)} ס״מ מהמשטח`,ids:[wsb.id,pad.id],fix:null});}
+      det.push(`משטח בגחון, פונה לקרקע; תחתית בגובה ${fmt(pad.z)} ס״מ מעל הקרקע`);
+    } else if(pad){ const end=pad.x<0?-1:1; const face=end>0?pad.x+pad.L/2:pad.x-pad.L/2;
+      if(li&&Math.sign(li.x)!==end) iss.push({t:'משטח הטעינה לא באותו קצה כמו ה־LiDAR – הכלי לא יראה את המחזיר בתחנה',ids:[pad.id,li.id],fix:{l:'העבר את המשטח לקצה של ה־LiDAR',f:st2=>mirrorPad(st2)}});
+      const pb={y0:pad.y-pad.W/2-2,y1:pad.y+pad.W/2+2,z0:pad.z-2,z1:pad.z+pad.H+2}; const stick=[];
+      sol.forEach(o=>{ if(o.compId===pad.id||o.id==='ch-mb-'+pad.id) return; const b=o.b; if(b.y1<pb.y0||b.y0>pb.y1||b.z1<pb.z0||b.z0>pb.z1) return;
+        const out_=end>0?b.x1-face:face-b.x0; if(out_>0.05) stick.push({o,out_})});
+      if(stick.length) iss.push({t:`בולטים מעבר למשטח הטעינה (התחנה לא תוכל להתקרב ל־0–${R.padTol} ס״מ): ${stick.map(x=>x.o.lab+' '+fmt(x.out_)+' ס״מ').join(', ')}`,ids:[pad.id,...stick.map(x=>x.o.compId).filter(Boolean)],fix:null});
+      if(wsb){const d=Math.hypot(wsb.x-pad.x,wsb.y-pad.y,(wsb.z+wsb.H/2)-(pad.z+pad.H/2)); det.push(`מרחק WSB–WSP ${fmt(d)} ס״מ`); if(d>R.wsbDist) iss.push({t:`WSB רחוק ${fmt(d)} ס״מ מהמשטח`,ids:[wsb.id,pad.id],fix:{l:'הזז את ה־WSB ליד המשטח',f:st2=>{const w=byKey(st2,'wsb'),p=byKey(st2,'wsp');const q=freeSpot(st2,w,p.x-Math.sign(p.x)*12,0);if(q){w.x=q.x;w.y=q.y;w.z=q.z}}}});}
+      det.push(`מרכז המשטח בגובה ${fmt(pad.z+pad.H/2)} ס״מ, בקצה ה${end>0?'קדמי':'אחורי'}`);
+    }
+    addCheck('charge','טעינה אלחוטית','משטח בגחון: שום דבר לא יכול להיות נמוך ממנו בתוך השטח שלו, כי הכלי נוסע מעל במת הטעינה (מרווח 0–2 ס״מ). משטח בדופן: צריך להיות הנקודה הבולטת בדופן ובאותו קצה כמו ה־LiDAR. בשני המקרים – קרוב ליחידת הקליטה.','Delta MOOVair 01; סיכום 18.11 סעיף 6',iss,det);
+  }
+  // 10 safety + clearance
+  { const iss=[],det=[]; const es=byKey(s,'estop');
+    if(es){ const top=es.z+es.H; if(top<R.estopH) iss.push({t:`כפתור החירום בגובה ${fmt(top)} – נמוך מ־${R.estopH}`,ids:[es.id],fix:{l:'הנח את הכפתור על הרכיב הגבוה הקרוב',f:st2=>{const e=byKey(st2,'estop');const b=byKey(st2,'battery');const p=freeSpot(st2,e,b.x,b.y,true);if(p){e.x=p.x;e.y=p.y;e.z=p.z}}}});
+      const above=sol.filter(o=>o.compId!==es.id&&o.b.z0>=top-0.1&&o.b.x0<es.x+es.L/2&&o.b.x1>es.x-es.L/2&&o.b.y0<es.y+es.W/2&&o.b.y1>es.y-es.W/2);
+      if(above.length) iss.push({t:`מעל כפתור החירום יש ${above.map(o=>o.lab).join(', ')} – קשה ללחוץ`,ids:[es.id,...above.map(o=>o.compId).filter(Boolean)],fix:null});
+      det.push(`כפתור חירום בגובה ${fmt(top)} ס״מ`); }
+    const sg=byKey(s,'signal');
+    if(sg){ const top=sg.z+sg.H; const cov=sol.filter(o=>o.compId!==sg.id&&o.kind!=='wheel'&&o.b.z0>=sg.z+sg.H*0.5&&o.b.x0<sg.x+sg.L/2&&o.b.x1>sg.x-sg.L/2&&o.b.y0<sg.y+sg.W/2&&o.b.y1>sg.y-sg.W/2);
+      if(cov.length||top<R.estopH) iss.push({t:cov.length?`נורת ההתראה מוסתרת מלמעלה ע״י ${cov.map(o=>o.lab).join(', ')}`:`נורת ההתראה נמוכה (${fmt(top)} ס״מ) – לא תיראה מעל השיחים`,ids:[sg.id,...cov.map(o=>o.compId).filter(Boolean)],fix:null});
+      det.push(`נורת התראה: ראש בגובה ${fmt(top)} ס״מ`); }
+    let low=Infinity,ln=''; sol.forEach(o=>{ if(o.kind==='wheel') return; if(o.b.z0<low){low=o.b.z0;ln=o.lab}}); out.kpi.belly=low;
+    det.push(`הנקודה הנמוכה (בלי גלגלים): ${fmt(low)} ס״מ – ${ln}`);
+    if(low<R.minClear) iss.push({t:`מרווח גחון ${fmt(low)} ס״מ (${ln}) – פחות מ־${R.minClear}`,ids:sol.filter(o=>o.kind==='comp'&&o.b.z0<R.minClear).map(o=>o.compId),fix:{l:`העלה את השלדה כך שהמרווח יהיה ${R.minClear}`,f:st2=>setChassis(st2,'clear',st2.ch.clear+(R.minClear-low))}});
+    addCheck('safety','בטיחות ומרווח גחון','כפתור חירום נגיש מבחוץ ובלי מכשול מעליו; שום חלק (חוץ מהגלגלים) לא נמוך ממרווח הגחון.','IDEC XW1E; הנחות',iss,det);
+  }
+  { const iss=[],det=[];
+    if(rockerOn(s)){ const m=s.ch.maxArt||12, {xf,xr}=axles(s), {px}=pivotOf(s); const hits=suspHits(s,sol);
+      const up=Math.max(xf-px,px-xr)*Math.sin(m*D);
+      det.push(`ארטיקולציה פסיבית: כל צד (גלגל קדמי + אחורי) מסתובב סביב ציר רוחבי ב־X=${fmt(px)}; הצדדים מקושרים – צד אחד עולה, השני יורד, הגוף נשאר באמצע.`);
+      det.push(`במהלך ±${m}° גלגל עולה/יורד עד ${fmt(up)} ס״מ – מספיק לתלם או גוש אדמה בגובה הזה בלי שגלגל יתרומם מהקרקע.`);
+      if(hits.size){ const fx={l:'הגבה את גוף הכלי מעל מהלך יחידות ההנעה',f:st2=>{ const c0=st2.ch.clear; for(let d=0.5;d<=20;d+=0.5){ const t2=clone(st2); setChassis(t2,'clear',c0+d); if(!suspHits(t2).size){ setChassis(st2,'clear',c0+d); return {moved:true,text:`גוף הכלי הוגבה ב־${d} ס״מ (מרווח ${fmt(c0+d)})`}; } } return {moved:false,text:'גם הגבהה של 20 ס״מ לא מספיקה – כדאי להקטין מהלך או להזיז את הרכיב'}; }};
+        iss.push({t:`במהלך המתלה (±${m}°) הגלגלים או יחידות ההנעה פוגעים ב: ${[...hits.keys()].map(name).join(', ')}`,ids:[...hits.keys()],fix:fx});
+        iss.push({t:`אפשרות אחרת: להקטין את מהלך המתלה (עכשיו ±${m}°)`,ids:[],fix:{l:'הקטן את המהלך עד שאין פגיעה',f:st2=>{for(let a=st2.ch.maxArt;a>=2;a-=1){st2.ch.maxArt=a;if(!suspHits(st2).size)return {moved:true,text:`מהלך ±${a}°`}} return {moved:false,text:'גם מהלך קטן פוגע – צריך להגביה או להזיז רכיבים'}}}}); }
+    } else det.push('מתלה קשיח: בקרקע לא אחידה (תלם, גוש) אחד הגלגלים מתרומם, ובהיגוי החלקה (skid steer) הוא מאבד אחיזה.');
+    addCheck('susp','מתלה ומהלך גלגלים','במתלה ארטיקולציה (כמו Warthog) הגלגלים זזים למעלה ולמטה. רכיב שבולט מעל הגלגל או יחידת ההנעה ייפגע כשהם עולים.','Clearpath Warthog: Geometric Passive Articulation',iss,det);
+  }
+  out.checks.forEach(ch=>ch.issues.forEach(i=>{ i.fixes=i.fix?[i.fix]:[];
+    [...new Set(i.ids)].filter(id=>movable(s.comps.find(c=>c.id===id))).slice(0,3).forEach(id=>{ const c=s.comps.find(k=>k.id===id);
+      i.fixes.push({l:`מקם מחדש את ${c.name}`,smart:id,f:st2=>smartPlace(st2,id)}); }); }));
+  out.cg=cg; out.st=st;
+  const fp=s.comps.filter(c=>c.mount==='top'&&physical(c)&&Math.abs(c.z-cTop)<0.3).reduce((a,c)=>a+c.L*c.W,0)+(byKey(s,'arm')?Math.PI*5.75*5.75:0);
+  out.kpi.fill=fp/(s.ch.L*s.ch.FW)*100;
+  out.kpi.warn=out.checks.filter(c=>c.status==='bad').reduce((a,c)=>a+c.issues.length,0);
+  out.warnIds=new Set(); out.checks.filter(c=>c.status==='bad').forEach(c=>c.issues.forEach(i=>i.ids.forEach(id=>id&&out.warnIds.add(id))));
+  return out;
+}
+const vol=b=>(b.x1-b.x0)*(b.y1-b.y0)*(b.z1-b.z0);
+function mirrorPad(s){const p=byKey(s,'wsp'),l=byKey(s,'lidar');const sg=Math.sign(l.x)||-1;p.mount=sg>0?'front':'rear';p.x=sg*(s.ch.L/2+p.L/2+1.0)}
+
+/* ================== placement helpers ================== */
+function supportZ(s,c){ // gravity: top of chassis or highest top-mounted comp under the footprint
+  const t=chTop(s), b=boxOf(c); let z=t;
+  s.comps.forEach(o=>{ if(o===c||!physical(o)||o.mount!=='top'&&o.mount!=='free') return; if(o.key==='bin') return;
+    const q=boxOf(o); if(c.x>q.x0&&c.x<q.x1&&c.y>q.y0&&c.y<q.y1&&q.z1<=c.z+0.3+(c._lift||0)) z=Math.max(z,q.z1)});
+  return r2(z);
+}
+function collides(s,c,ignore){
+  const b=c.shape==='actuator'?actBox(s):boxOf(c);
+  return solids(s).some(o=>{ if(o.compId===c.id||o.nocol) return false; if(ignore&&ignore(o)) return false;
+    if(c.key==='bin'&&(o.c?.key==='loadcell'||o.c?.key==='actuator'||o.id.startsWith('ch-hinge')||o.id==='ch-actbr')) return false;
+    if(c.key==='lidar'&&(o.id==='ch-lpost')) return false; if(c.key==='rtk'&&o.id==='ch-mast') return false;
+    return overlap(b,o.b)});
+}
+function freeSpot(s,c,tx,ty,allowStack){
+  const L=s.ch.L, FW=s.ch.FW, ox=c.x,oy=c.y,oz=c.z; let best=null,bd=Infinity;
+  for(let dx=0;dx<=L;dx+=1)for(const sx of dx?[1,-1]:[1])for(let dy=0;dy<=FW;dy+=1)for(const sy of dy?[1,-1]:[1]){
+    const d=dx+dy*1.3; if(d>=bd) continue; const x=tx+sx*dx,y=ty+sy*dy;
+    if(c.mount==='top'&&(Math.abs(x)>L/2||Math.abs(y)>FW/2)) continue;
+    c.x=x;c.y=y; if(c.mount==='top'){c.z=chTop(s); if(allowStack){c._lift=200;c.z=supportZ(s,c);delete c._lift} }
+    resolve(s);
+    if(!collides(s,c)){best={x,y,z:c.z};bd=d}
+  }
+  c.x=ox;c.y=oy;c.z=oz; resolve(s); return best;
+}
+function recSpot(s,c){
+  const ch=s.ch,{xf,xr}=axles(s),t=chTop(s),L=ch.L;
+  const R={
+    battery:[(xf+xr)/2,0,'המסה הכבדה בכלי (13.7 ק״ג). נמוך ובמרכז בין הצירים = מרכז כובד נמוך וחלוקת עומס שווה בין הגלגלים.'],
+    arm:[-L/2+12,-(ch.FW/2-6),'בקצה של ה־LiDAR, כך שהארגז בצד השני בטווח השחרור ונשאר מקום לפריקה בלי לפגוע בזרוע.'],
+    ebox:[null,0,'צמודה לצד הסוללה שפונה לארגז, על אותו בסיס, הפאה הרחבה מול הסוללה – כבלי חשמל הכי קצרים.'],
+    roboteq:[null,0,'אחד צמוד לצד הסוללה שליד הזרוע (לגלגלים האחוריים), השני על הרצפה מתחת לארגז ליד הציר הקדמי – כבלי מנוע קצרים לכל זוג גלגלים.'],
+    wsb:[null,0,'מתחת לסוללה, בין קורות האורך – כבל קצר לסוללה ולמשטח הקליטה שמתחתיה.'],
+    estop:[-L/2+25,ch.FW/2-4,'גבוה ובקצה, כך שאפשר להגיע ביד מבחוץ.'],
+    signal:[-L/2+20,ch.FW/2-4,'גבוה ובולט, נראה מכל הכיוונים.'],
+    lidar:[null,0,'בקצה של הזרוע, צמוד מעל המצלמה האחורית, זקוף, מרכז בגובה 32 – רואה את דופן השיח 29.5–57.6 (סיכום 1.9).'],
+    oak:[null,0,'בציר בין הגלגלים, גובה 15, הטיה 15° למטה – רואה מכשולים 0–40 ס״מ (סיכום 1.6).'],
+    wsp:[null,0,'בגחון, ממש מתחת ליחידת הקליטה, פונה לקרקע – הכלי נוסע מעל במת הטעינה.'],
+    rtk:[null,0,'על תורן מעל הסוללה, בגובה הנמוך ביותר שבו לא השיחים (61) ולא הארגז והזרוע חוסמים לוויינים מעל 15°.'],
+    bin:[L/2-20,0,'מעל הציר הקדמי, בטווח הזרוע, וציר הפריקה בקצה כדי שהפלפלים ייפלו מחוץ לכלי.']
+  }[c.key];
+  if(!R) return null; let [x,y,why]=R;
+  if(c.key==='oak'){x=c.mount==='front'?L/2+c.L/2+0.1:-L/2-c.L/2-0.1;return {x,y:0,z:15-c.H/2,why}}
+  if(c.key==='lidar'){ const rc=s.comps.find(k=>k.key==='oak'&&k.mount==='rear'); return {x:rc?rc.x:-L/2-c.L/2,y:rc?rc.y:0,z:32-c.H/2,why}; }
+  if(c.key==='roboteq'){ const t2=clone(s); placeRoboteqs(t2); const r=t2.comps.find(k=>k.id===c.id); return {x:r.x,y:r.y,z:r.z,why,dims:[r.L,r.W,r.H]}; }
+  if(c.key==='wsb'){ const b=byKey(s,'battery'); return {x:b?b.x:0,y:0,z:underZ(s,c),why}; }
+  if(c.key==='wsp'){ const w=byKey(s,'wsb'); const b=byKey(s,'battery'); const zt=Math.min(w?w.z:ch.clear,ch.clear); return {x:w?w.x:(b?b.x:0),y:w?w.y:0,z:r2(zt-c.H-0.1),why}; }
+  if(c.key==='rtk'){ const t2=clone(s); antennaOverBattery(t2); const a=byKey(t2,'rtk'); return {x:a.x,y:a.y,z:a.z,why}; }
+  if(c.key==='ebox'){ const t2=clone(s); eboxBesideBattery(t2); const e=byKey(t2,'ebox'); return {x:e.x,y:e.y,z:e.z,why,dims:[e.L,e.W,e.H]}; }
+  if(c.key==='bin'){const z=Math.max(ch.wheelD+3,...s.comps.filter(o=>o.mount==='top'&&physical(o)&&Math.abs(o.x-x)<c.L/2+o.L/2).map(o=>o.z+o.H+3.5));return {x,y,z:r1(z),why}}
+  return {x,y,z:t,why,free:true};
+}
+function underZ(s,c){ const ch=s.ch; return ch.type==='ladder'&&ch.FW-2*ch.profW>=c.W+0.2?r2(chTop(s)-c.H):r2(ch.clear-c.H); }
+function moveToRec(s,c){ const r=recSpot(s,c); if(!r) return false;
+  if(r.free){ const p=freeSpot(s,c,r.x,r.y,['estop','signal'].includes(c.key)); if(!p) return false; c.x=p.x;c.y=p.y;c.z=p.z; }
+  else {c.x=r2(r.x);c.y=r2(r.y);c.z=r2(r.z); if(r.dims){[c.L,c.W,c.H]=r.dims} if(c.key==='rtk')c.onLidar=false;} resolve(s); return true; }
+function autoLayout(s,jitter){
+  const wantRear=s.bin.dir==='rear'; s.bin.dir='front'; resolve(s);
+  const ch=s.ch,L=ch.L,FW=ch.FW,t=chTop(s),x0=-L/2, rnd=()=>Math.random();
+  const free=c=>c&&!c.locked; const K=k=>s.comps.filter(c=>c.key===k);
+  const li=byKey(s,'lidar'),arm=byKey(s,'arm'),bat=byKey(s,'battery'),eb=byKey(s,'ebox'),bin=byKey(s,'bin'),pad=byKey(s,'wsp'),wsb=byKey(s,'wsb'),an=byKey(s,'rtk');
+  const sgArm=jitter&&rnd()<.5?1:-1, G=0.1;
+  s.comps.forEach(c=>{ if(free(c)&&(c.mount==='top'||c.shape==='arm')){c.x=2000+rnd()*50;c.y=2000} });
+  if(free(bin)){ bin.x=r2(L/2-bin.L/2); bin.y=0; } resolve(s);
+  // pack the floor sequence toward the front, ending just behind the actuator bracket
+  // pack the floor from the arm end: arm, battery (e-box lies on it), motor controllers
+  K('roboteq').forEach(c=>{ if(free(c)&&c.H>c.L){[c.L,c.H]=[c.H,c.L]} });
+  if(free(eb)){ const d=[eb.L,eb.W,eb.H].sort((a,b)=>a-b); eb.L=d[0]; eb.W=d[2]; eb.H=d[1]; }
+  const RQ=K('roboteq').filter(free); RQ.forEach(c=>{c.x=2000;c.y=2000});
+  if(RQ[0]){ const d=[RQ[0].L,RQ[0].W,RQ[0].H].sort((a,b)=>a-b); RQ[0].L=d[0]; RQ[0].W=d[2]; RQ[0].H=d[1]; }
+  let seq=[arm,RQ[0],bat,eb].filter(Boolean);
+  const g0=bin?actGeom(s,0):null, endX=bin?Math.min(L/2,g0.B[0]-2-G):L/2;
+  const need=seq.reduce((a,c)=>a+(c.shape==='arm'?11.5:c.L)+G,0)+(RQ[1]?Math.max(RQ[1].L,RQ[1].W)+0.5:0);
+  const rc0=K('oak').find(c=>c.mount==='rear'); const lidIn=li&&rc0?(-L/2-rc0.L/2)+li.L/2+0.2:x0+0.25;
+  let cur=Math.max(x0+0.25,lidIn,Math.min(endX-need, x0+0.25+Math.max(0,(L-100)/2)));
+  seq.forEach(c=>{ if(!free(c)) return; const half=c.shape==='arm'?5.75:c.L/2; c.x=r2(cur+half); c.y=c.shape==='arm'?r2(sgArm*(FW/2-6)):0; c.z=t; cur=c.x+half+(c.key==='roboteq'?0.5:G); });
+  if(free(eb)) eboxBesideBattery(s);
+  resolve(s); placeRoboteqs(s);
+
+  if(free(wsb)){ wsb.mount='free'; const bx=bat?bat.x:0; wsb.y=0; wsb.z=underZ(s,wsb); const half=bat?Math.max(0,bat.L/2-wsb.L/2):0;
+    for(const dx of [0,1,-1,2,-2,3,-3,4,-4,5,-5,6,-6,7,-7,8,-8,9,-9,10,-10,12,-12,14,-14].filter(d=>Math.abs(d)<=half+0.01)){ wsb.x=r2(bx+dx); resolve(s); if(!collides(s,wsb)) break; } }
+  if(bat){ const onB=eb&&Math.abs(eb.z-(bat.z+bat.H))<0.3; const host=onB?eb:bat; const sy=onB?(eb.y<bat.y?-1:1):-1; const A=armBase(s), dir=A&&A.x>host.x?-1:1; const x0h=dir>0?host.x-host.L/2:host.x+host.L/2;
+    [['signal',3.5],['estop',9]].forEach(([k,dx])=>{const c=byKey(s,k); if(!free(c))return; c.x=r2(x0h+dir*dx); c.y=r2(host.y+sy*(host.W/2-3.2)); c.z=r2(host.z+host.H); c.mount='top'}); }
+  K('oak').forEach(c=>{ if(!free(c)) return; const sg=c.mount==='front'?1:-1; c.x=r2(sg*(L/2+c.L/2)); c.z=r2(15-c.H/2); c.y=0; });
+  const rcam=K('oak').find(c=>c.mount==='rear'); if(free(li)){ li.mount='rear'; li.x=rcam?rcam.x:r2(-L/2-li.L/2); li.y=rcam?rcam.y:0; li.z=r2(32-li.H/2); }
+  if(free(pad)){ if(pad.axis!=='z'){pad.axis='z';[pad.L,pad.H]=[pad.H,pad.L]} pad.mount='belly'; pad.x=wsb?wsb.x:(bat?bat.x:0); pad.y=wsb?wsb.y:0; pad.z=r2(Math.min(wsb?wsb.z:ch.clear,ch.clear)-pad.H-0.1); }
+  if(free(an)) antennaOverBattery(s);
+  if(free(bin)){ resolve(s); let under=t; s.comps.forEach(c=>{ if(c===bin||!physical(c)||c.mount==='bin'||c.shape==='actuator'||c.key==='rtk') return; const b=boxOf(c); if(b.x1>bin.x-bin.L/2&&b.x0<bin.x+bin.L/2&&b.z1<45) under=Math.max(under,b.z1)});
+    const lc=byKey(s,'loadcell'); bin.z=r1(Math.max(ch.wheelD+3,under+(lc?lc.H:0)+1,t+s.bin.actClosed*Math.cos((s.bin.actAng||0)*D))); }
+  resolve(s);
+  [...s.comps].forEach(c=>{ if(!free(c)||c.shape==='none'||['wheels','armtip','arm','bin','binact'].includes(c.mount)||['rtk','lidar','wsp','wsb'].includes(c.key)) return;
+    if(c.x>1000||collides(s,c)){ const p=freeSpot(s,c,c.x>1000?0:c.x,c.y>1000?0:c.y,canStack(c)); if(p){c.x=p.x;c.y=p.y;c.z=p.z} } resolve(s); });
+  if(bin&&eb){ const a=solids(s).find(o=>o.id==='ch-actbr'); if(a&&overlap(a.b,boxOf(eb))){ const {hx}=hingeOf(s); s.bin.actD=r1(Math.max(2,hx-(eb.x+eb.L/2)-2-G)); resolve(s);} }
+  if(free(an)) antennaOverBattery(s);
+  resolve(s); if(rockerOn(s)){ for(let a=s.ch.maxArt||12;a>=1;a-=0.5){ s.ch.maxArt=a; if(!suspHits(s).size) break; } }
+  s.arm=restPose(s);
+  if(wantRear){
+    s.comps.forEach(c=>{ if(c.key==='oak'||['wheels','armtip','arm'].includes(c.mount)||c.locked) return; c.x=r2(-c.x); if(c.mount==='front')c.mount='rear'; else if(c.mount==='rear')c.mount='front'; });
+    const fc=K('oak').find(c=>c.mount==='front'); if(li&&fc&&!li.locked){li.x=fc.x;li.y=fc.y;li.mount='front'}
+    s.bin.dir='rear'; resolve(s); s.arm=restPose(s);
+  }
+  resolve(s);
+}
+
+/* ---------- engineering relocation: search candidate spots, score with all checks ---------- */
+const canStack=c=>['estop','signal','roboteq','wsb'].includes(c.key)||(c.H<=8&&c.weight<1);
+const FIXED_MOUNTS=['wheels','armtip','arm','binact','bin'];
+function movable(c){return c&&!c.locked&&c.shape!=='none'&&!FIXED_MOUNTS.includes(c.mount)}
+function binZ(s,bin){ const t=chTop(s); let under=t; s.comps.forEach(c=>{ if(c===bin||!physical(c)||c.mount==='bin'||c.shape==='actuator'||c.key==='rtk') return; const b=boxOf(c); if(b.x1>bin.x-bin.L/2&&b.x0<bin.x+bin.L/2&&b.y1>bin.y-bin.W/2&&b.y0<bin.y+bin.W/2&&b.z1<50) under=Math.max(under,b.z1)});
+  const lc=byKey(s,'loadcell'); return r1(Math.max(s.ch.wheelD+3,under+(lc?lc.H:0)+1,t+s.bin.actClosed*Math.cos((s.bin.actAng||0)*D))); }
+function candidates(s,c){
+  const L=s.ch.L,FW=s.ch.FW,out=[],TW=Math.max(totalWidthWheels(s),s.rules.maxWidth);
+  const range=(a,b,st)=>{const o=[];for(let v=a;v<=b+1e-6;v+=st)o.push(r2(v));return o};
+  if(c.mount==='top'||c.shape==='arm'){ const hw=c.shape==='arm'?5.75:c.L/2, stack=canStack(c);
+    range(-L/2+Math.min(hw,L/2-1),L/2-Math.min(hw,L/2-1),Math.max(2,L/40)).forEach(x=>range(-FW/2+2,FW/2-2,2).forEach(y=>out.push({x,y,sup:true,stack}))); }
+  else if(c.mount==='front'||c.mount==='rear'){ const isCam=c.fov&&c.fov.type==='cam'; const zs=isCam?range(c.z-3,c.z+3,1):range(Math.max(s.rules.minClear,4),30,1.5);
+    const ends=isCam?[[c.x,c.mount]]:[[c.x,c.mount],[-c.x,c.mount==='front'?'rear':'front']];
+    ends.forEach(([x,m])=>range(-(TW/2-c.W/2),TW/2-c.W/2,1.5).forEach(y=>zs.forEach(z=>out.push({x,y,z,mount:m})))); }
+  else if(c.key==='rtk'){ range(-L/2+3,L/2-3,4).forEach(x=>range(-FW/2+2,FW/2-2,4).forEach(y=>out.push({x,y,zTop:true}))); }
+  else if(c.mount==='belly'){ range(-L/2+c.L/2,L/2-c.L/2,2).forEach(x=>range(-FW/2+c.W/2-4,FW/2-c.W/2+4,2).forEach(y=>out.push({x,y,z:r2(s.ch.clear-c.H-0.1)}))); }
+  else if(c.key==='lidar'){ const rc=s.comps.find(k=>k.key==='oak'&&k.mount==='rear'); range(-L/2-c.L/2,L/2+c.L/2,3).forEach(x=>[-6,-3,0,3,6].forEach(y=>[30,32,35].forEach(h=>out.push({x,y,z:h-c.H/2,mount:Math.abs(x)>L/2-c.L/2?(x<0?'rear':'front'):'free'})))); if(rc) out.push({x:rc.x,y:rc.y,z:32-c.H/2,mount:'rear'}); }
+  else if(c.key==='bin'){ range(c.x-24,c.x+24,2).forEach(x=>{ if(Math.abs(x)<=L/2) out.push({x,y:0,binz:true}) }); }
+  else { range(-L/2,L/2,3).forEach(x=>range(-FW/2,FW/2,3).forEach(y=>out.push({x,y,z:c.z}))); }
+  return out;
+}
+function placeScore(s,R,id){ let sc=0; R.checks.forEach(ch=>ch.issues.forEach(i=>{sc+=i.ids.includes(id)?4:1}));
+  sc+=(R.lidar?R.lidar.pct:0)*0.05+Math.max(0,s.rules.minLat-R.stab.minLat)*0.3+Math.max(0,s.rules.minLong-R.stab.minLon)*0.3+R.cg.z*0.01;
+  const li=byKey(s,'lidar'); if(li) sc+=Math.abs(li.z+li.H/2-32)*0.12; return sc; }
+function smartPlace(s,id){
+  resolve(s); const c=s.comps.find(k=>k.id===id); if(!movable(c)) return null; if(c.key==='rtk') c.onLidar=false;
+  const orig={x:c.x,y:c.y,z:c.z,mount:c.mount}, rec=recSpot(s,c), base=placeScore(s,compute(s),id);
+  const ok=[], cands=candidates(s,c);
+  if(c.mount==='top'||c.shape==='arm'){ [[rec?rec.x:c.x,rec?rec.y:c.y],[orig.x,orig.y]].forEach(([tx,ty])=>{ const q=freeSpot(s,c,tx,ty,canStack(c)); if(q) cands.push({x:q.x,y:q.y,z:q.z}); }); }
+  for(const p of cands){
+    c.x=p.x; c.y=p.y; if(p.mount) c.mount=p.mount;
+    if(p.sup){ c.z=chTop(s); if(p.stack){c._lift=200;c.z=supportZ(s,c);delete c._lift} }
+    else if(p.binz){ c.z=binZ(s,c); }
+    else if(p.zTop){ let top=0; c.z=500; resolve(s); solids(s).forEach(o=>{if(o.compId!==c.id&&o.id!=='ch-mast')top=Math.max(top,o.b.z1)}); armSample(s,{yaw:0,sh:0,el:160,wr:-70}).forEach(q=>top=Math.max(top,q[2]+3.5)); c.z=r1(top+0.5); }
+    else c.z=p.z;
+    resolve(s);
+    if(!collides(s,c)){ const dr=rec?Math.hypot(c.x-rec.x,c.y-rec.y,(c.z-rec.z)||0):0; ok.push({x:c.x,y:c.y,z:c.z,mount:c.mount,d:dr+0.4*Math.hypot(c.x-orig.x,c.y-orig.y,c.z-orig.z)}); }
+  }
+  ok.sort((a,b)=>a.d-b.d);
+  const near=ok.slice(0,30), rest=ok.slice(30).sort(()=>Math.random()-.5).slice(0,25);
+  let best={...orig,score:base,d:0,same:true};
+  c.mount=orig.mount;
+  for(const p of [...near,...rest]){ c.x=p.x;c.y=p.y;c.z=p.z;c.mount=p.mount; resolve(s); const sc=placeScore(s,compute(s),id)+p.d*0.015; if(sc<best.score-0.05) best={...p,score:sc}; }
+  c.x=best.x;c.y=best.y;c.z=best.z;c.mount=best.mount; resolve(s);
+  if(best.same) return {moved:false,text:`לא נמצא מקום טוב יותר ל${c.name} בלי לייצר בעיות חדשות. כדאי להזיז רכיב אחר שמעורב באזהרה.`};
+  return {moved:true,text:`${c.name} → X ${fmt(c.x)}, Y ${fmt(c.y)}, Z ${fmt(c.z)}${rec?'. '+rec.why:''}`};
+}
+
+
+function rtkSkyOf(s,sol){ const an=byKey(s,'rtk'), R=s.rules; if(!an) return {worst:-90,wn:''}; sol=sol||solids(s);
+  const P=[an.x,an.y,an.z+an.H]; let worst=-90,wn='';
+  const chk=(p,id)=>{const d=sub(p,P),hd=Math.hypot(d[0],d[1]); if(hd<7.6){if(d[2]>0.5){worst=90;wn=id} return;} const el=Math.atan2(d[2],hd)/D; if(el>worst){worst=el;wn=id}};
+  sol.forEach(o=>{ if(o.compId===an.id||o.id==='ch-mast') return; boxPts(o.b,3).forEach(p=>chk(p,o.compId||o.id)) });
+  const arm=armBase(s); if(arm) armSample(s,s.arm).forEach(p=>chk(add(p,[0,0,3.5]),arm.id));
+  const bushEl=Math.atan2(R.bushH-P[2],Math.max(1,R.pathW/2-Math.abs(P[1])))/D; if(bushEl>worst){worst=bushEl;wn='__bush'}
+  return {worst,wn}; }
+function minRtkZ(s,x,y){ const an=byKey(s,'rtk'); const ox=an.x,oy=an.y,oz=an.z; an.x=x; an.y=y; let z=null;
+  for(let h=30;h<=110;h+=0.5){ an.z=h; resolve(s); const sol=solids(s); if(sol.some(o=>o.id!=='ch-mast'&&o.compId!==an.id&&!o.nocol&&overlap(boxOf(an),o.b))) continue; if(rtkSkyOf(s,sol).worst<=s.rules.rtkSky){z=h;break} }
+  an.x=ox;an.y=oy;an.z=oz; resolve(s); return z==null?oz:r1(z); }
+/* ---------- on-battery arrangement & arm rest pose ---------- */
+function eboxOnBattery(s){ const b=byKey(s,'battery'),e=byKey(s,'ebox'); if(!b||!e||e.locked) return;
+  const dims=[e.L,e.W,e.H].sort((a,b)=>b-a); const along=b.L>=b.W?'x':'y';
+  if(along==='x'){ e.L=dims[0]; e.W=dims[1]; } else { e.W=dims[0]; e.L=dims[1]; } e.H=dims[2];
+  const A=armBase(s), away=A&&A.x<b.x?1:-1; // overhang points away from the arm
+  if(along==='x'){ e.x=r2(b.x+away*(e.L-b.L)/2); e.y=r2(b.y-b.W/2+e.W/2); } else { e.y=b.y; e.x=r2(b.x-b.L/2+e.L/2); }
+  e.z=r2(b.z+b.H); e.mount='top'; }
+function eboxBesideBattery(s){ const b=byKey(s,'battery'),e=byKey(s,'ebox'),bin=byKey(s,'bin'); if(!b||!e||e.locked) return;
+  const d=[e.L,e.W,e.H].sort((a,b)=>a-b); e.L=d[0]; e.W=d[2]; e.H=d[1]; // thin side toward the bin, long side across, middle up
+  const sg=bin&&bin.x<b.x?-1:1; e.x=r2(b.x+sg*(b.L/2+e.L/2)); e.y=b.y; e.z=b.z; e.mount='top'; }
+
+function placeRoboteqs(s){ // rear one flush on the battery's arm-side face (like the e-box), front one on the floor under the bin by the front axle
+  const b=byKey(s,'battery'), bin=byKey(s,'bin'), R=s.comps.filter(c=>c.key==='roboteq'&&!c.locked); if(!b||!R.length) return;
+  const sg=bin&&bin.x<b.x?-1:1; const d=[R[0].L,R[0].W,R[0].H].sort((a,b)=>a-b);
+  const r0=R[0]; r0.L=d[0]; r0.W=d[2]; r0.H=d[1]; r0.x=r2(b.x-sg*(b.L/2+r0.L/2)); r0.y=b.y; r0.z=b.z; r0.mount='top';
+  if(R[1]){ const r1_=R[1]; r1_.L=d[2]; r1_.W=d[1]; r1_.H=d[0]; const {xf,xr}=axles(s); const ax=sg>0?xf:xr; r1_.y=0; r1_.z=chTop(s); r1_.mount='top';
+    const x0_=ax-sg*(r1_.L/2+2); let ok=false; for(let k=0;k<=40&&!ok;k++){ for(const d of k?[k,-k]:[0]){ r1_.x=r2(x0_+d); resolve(s); if(!collides(s,r1_)){ok=true;break} } } }
+  resolve(s); }
+function antennaOverBattery(s){ const b=byKey(s,'battery'),an=byKey(s,'rtk'),e=byKey(s,'ebox'); if(!b||!an||an.locked) return;
+  an.onLidar=false; an.mount='free';
+  // mast on the free half of the battery top (side opposite the e-box)
+  const sideY=e&&Math.abs(e.z-(b.z+b.H))<0.3&&b.L>=b.W?(e.y<b.y?1:-1):1;
+  const y=b.L>=b.W?r2(b.y+sideY*(b.W/2-5)):b.y; let best=null;
+  for(let dx=-b.L/2+2;dx<=b.L/2-2+1e-6;dx+=2){ const x=r2(b.x+dx); const z=minRtkZ(s,x,y); if(!best||z<best.z-0.01) best={x,z}; }
+  an.x=best.x; an.y=y; an.z=best.z; resolve(s); }
+function restPose(s){ const A=armBase(s); if(!A) return {yaw:0,sh:0,el:160,wr:-70};
+  const sol=solids(s).filter(o=>o.compId!==A.id&&!o.nocol); let best=null,bs=1e9;
+  const an=byKey(s,'rtk'), AP=an?[an.x,an.y,an.z+an.H]:null, li=byKey(s,'lidar'), LP=li?[li.x,li.y,li.z+li.H/2]:null;
+  for(let yaw=-180;yaw<180;yaw+=15)for(let sh=-30;sh<=45;sh+=15)for(let el=110;el<=165;el+=11)for(let wr=-120;wr<=0;wr+=20){
+    const pose={yaw,sh,el,wr}; const pts=armSample(s,pose); let ok=true,mz=0;
+    for(const p of pts){ if(p[2]<3||Math.abs(p[1])>s.rules.maxWidth/2-3.5||Math.abs(p[0])>s.ch.L/2+2){ok=false;break} mz=Math.max(mz,p[2]); for(const o of sol){ const b=o.b; if(p[0]>b.x0-3&&p[0]<b.x1+3&&p[1]>b.y0-3&&p[1]<b.y1+3&&p[2]>b.z0-3&&p[2]<b.z1+3){ok=false;break} } if(!ok) break; }
+    if(!ok) continue;
+    if(AP&&pts.some(p=>{const hd=Math.hypot(p[0]-AP[0],p[1]-AP[1]);const dz=p[2]+3.5-AP[2];return hd<8?dz>0:Math.atan2(dz,hd)/D>s.rules.rtkSky-1})) continue;
+    let lb=0; if(LP) pts.forEach(p=>{const hd=Math.hypot(p[0]-LP[0],p[1]-LP[1]); if(hd<60){const el=Math.atan2(p[2]-LP[2],hd)/D; if(el>-7&&el<52) lb+=1/(hd+5)}});
+    const sc=mz+0.05*Math.abs(yaw)+lb*40; if(sc<bs){bs=sc;best=pose} }
+  return best||{yaw:0,sh:0,el:160,wr:-70}; }
+function setChassis(s,k,v){ // keeps mounted comps attached
+  const oldTop=chTop(s), oldL=s.ch.L, oldTW=totalWidthWheels(s);
+  if(k==='TW'){ s.ch.FW=r1(Math.max(6,v-2*(s.ch.gap+s.ch.tireW))); resolve(s); return; }
+  if(k==='susp'||k==='beamW'){ s.ch[k]=v; if(rockerOn(s)){ s.ch.beamW=s.ch.beamW||2; s.ch.maxArt=s.ch.maxArt||12; s.ch.pivX=s.ch.pivX||0; const g2=Math.max(s.ch.gap,r1(s.ch.beamW+0.5)); if(g2!==s.ch.gap){s.ch.gap=g2; s.ch.FW=r1(Math.max(6,oldTW-2*(s.ch.gap+s.ch.tireW)));} } resolve(s); return; }
+  s.ch[k]=v; if(k==='gap'||k==='tireW'||k==='wheelD'&&false) s.ch.FW=r1(Math.max(6,oldTW-2*(s.ch.gap+s.ch.tireW))); const dz=chTop(s)-oldTop, dL=s.ch.L-oldL;
+  s.comps.forEach(c=>{ if(c.mount==='top'||c.shape==='arm'||(c.key==='wsb'&&c.mount==='free')||c.mount==='belly') c.z=r2(c.z+dz); if(c.mount==='front') c.x=r2(c.x+dL/2); if(c.mount==='rear') c.x=r2(c.x-dL/2); });
+  const {xf,xr}=axles(s); const lim=s.ch.L/2-3; if(k==='L'&&(xf>lim||xr<-lim)){s.ch.WB=Math.max(s.ch.wheelD+2,Math.min(s.ch.WB,2*lim-2*Math.abs(s.ch.axOff)))}
+  resolve(s);
+}
+function fitChassis(s,shrink){
+  resolve(s); const on=s.comps.filter(c=>(c.mount==='top'&&physical(c))||c.shape==='arm');
+  let x0=1e9,x1=-1e9,ym=0; on.forEach(c=>{const b=boxOf(c);x0=Math.min(x0,b.x0);x1=Math.max(x1,b.x1);ym=Math.max(ym,Math.abs(b.y0),Math.abs(b.y1))});
+  const li=byKey(s,'lidar'),an=byKey(s,'rtk'),bn=byKey(s,'bin');
+  [li,an].forEach(c=>{if(c&&c.mount==='free'&&!(c.key==='rtk'&&c.onLidar&&li&&li.mount!=='free')){x0=Math.min(x0,c.x-1);x1=Math.max(x1,c.x+1)}});
+  s.comps.filter(c=>c.mount==='belly'||(c.key==='wsb'&&c.mount==='free')).forEach(c=>{const b=boxOf(c);x0=Math.min(x0,b.x0);x1=Math.max(x1,b.x1)});
+  if(bn){const {hx,sgn}=hingeOf(s); x0=Math.min(x0,sgn>0?hx-s.ch.profW:hx); x1=Math.max(x1,sgn>0?hx:hx+s.ch.profW); const g=actGeom(s,0); x0=Math.min(x0,g.B[0]-2);x1=Math.max(x1,g.B[0]+2)}
+  if(!shrink){x0=Math.min(x0,-s.ch.L/2);x1=Math.max(x1,s.ch.L/2);ym=Math.max(ym,s.ch.FW/2)}
+  const cx=(x0+x1)/2, newL=r1(x1-x0);
+  s.comps.forEach(c=>{ if(c.mount!=='front'&&c.mount!=='rear'&&c.mount!=='armtip'&&c.mount!=='arm'&&c.mount!=='wheels') c.x=r2(c.x-cx); });
+  const oldL=s.ch.L; s.comps.forEach(c=>{ if(c.mount==='front') c.x=r2(c.x-cx+(newL-oldL)/2+cx); if(c.mount==='rear') c.x=r2(c.x-cx-(newL-oldL)/2+cx); });
+  s.ch.L=newL; const wMax=s.rules.maxWidth-2*(s.ch.gap+s.ch.tireW);
+  s.ch.FW=r1(shrink?Math.max(2*s.ch.profW+4,Math.min(s.ch.FW,2*ym)):Math.min(Math.max(s.ch.FW,2*ym),Math.max(s.ch.FW,wMax)));
+  const wbMax=newL-s.ch.wheelD+1; s.ch.axOff=0; s.ch.WB=r1(Math.max(s.ch.wheelD+2,shrink?wbMax:Math.min(s.ch.WB,wbMax)));
+  resolve(s);
+  for(let k=0;k<60;k++){ const bad=s.comps.filter(c=>(c.mount==='front'||c.mount==='rear')&&collides(s,c)); if(!bad.length) break;
+    s.ch.L=r2(s.ch.L+0.5); s.comps.forEach(c=>{ if(c.mount==='front') c.x=r2(c.x+0.25); if(c.mount==='rear') c.x=r2(c.x-0.25); }); if(shrink) s.ch.WB=r1(Math.max(s.ch.wheelD+2,s.ch.L-s.ch.wheelD+1)); resolve(s); }
+}
+
+/* ================== app state, undo, persistence ================== */
+let S=makeDefault(); resolve(S);
+let RES=compute(S);
+const UI={view:'3d',mode:'design',sel:null,showDetails:false,fovMode:'sel',cables:'none',arrows:true,dims:false,bushes:true,reach:true,labels:false,render:'solid',avoid:true,cardOpen:false};
+let hist={past:[],future:[]};
+const CFG={list:{},active:null,draft:false};
+function commit(mut,label){ const before=JSON.stringify(S); mut&&mut(S); resolve(S); const after=JSON.stringify(S); if(before===after) return;
+  hist.past.push(before); if(hist.past.length>80) hist.past.shift(); hist.future=[]; changed(); }
+function changed(noSave){ RES=compute(S); renderAll(); if(!noSave) scheduleSave(); }
+function undo(){ if(!hist.past.length) return; hist.future.push(JSON.stringify(S)); S=JSON.parse(hist.past.pop()); changed(); }
+function redo(){ if(!hist.future.length) return; hist.past.push(JSON.stringify(S)); S=JSON.parse(hist.future.pop()); changed(); }
+
+
+// ---------- GitHub storage (when the page is served from GitHub Pages) ----------
+const GH={owner:'',repo:'',branch:'data',dir:'configs',token:'',shas:{},timer:null,busy:false,ok:false};
+(function(){ const h=location.hostname; if(h.endsWith('.github.io')){ GH.owner=h.split('.')[0]; GH.repo=(location.pathname.split('/').filter(Boolean)[0])||(GH.owner+'.github.io'); }
+  try{ const m=location.hash.match(/[#&]k=([^&]+)/); if(m){ localStorage.setItem('kli-gh-token',decodeURIComponent(m[1])); history.replaceState(null,'',location.pathname+location.search); } GH.token=localStorage.getItem('kli-gh-token')||''; }catch(e){} })();
+const ghOn=()=>!!GH.owner;
+window.addEventListener('hashchange',()=>{ if(/[#&]k=/.test(location.hash)) location.reload(); });
+const b64e=str=>{ const b=new TextEncoder().encode(str); let s=''; for(let i=0;i<b.length;i+=0x8000) s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000)); return btoa(s); };
+const b64d=b=>new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g,'')),c=>c.charCodeAt(0)));
+async function gh(path,opt={}){ const h={'Accept':'application/vnd.github+json'}; if(GH.token) h.Authorization='Bearer '+GH.token; if(opt.body) h['Content-Type']='application/json';
+  const r=await fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+path,{method:opt.method||'GET',headers:h,body:opt.body?JSON.stringify(opt.body):undefined,cache:'no-store'});
+  let j=null; try{ j=await r.json() }catch(e){} return {status:r.status,ok:r.ok,j}; }
+async function ghEnsureBranch(){ let r=await gh('/branches/'+GH.branch); if(r.ok) return true; if(r.status!==404||!GH.token) return false;
+  const repo=await gh(''); if(!repo.ok) return false; const ref=await gh('/git/ref/heads/'+repo.j.default_branch); if(!ref.ok) return false;
+  const c=await gh('/git/refs',{method:'POST',body:{ref:'refs/heads/'+GH.branch,sha:ref.j.object.sha}}); return c.ok; }
+async function ghPoll(){ if(GH.busy) return; GH.busy=true;
+  try{ const r=await gh('/contents/'+GH.dir+'?ref='+GH.branch);
+    if(r.status===404){ // nothing saved yet → seed from the configs that came with the site
+      if(GH.token&&await ghEnsureBranch()){ let seed=[]; try{ seed=await (await fetch('seed-configs.json',{cache:'no-store'})).json() }catch(e){}
+        for(const c of seed){ const cfg={...c,updatedAt:Date.now()}; await ghWrite(cfg); } GH.busy=false; return ghPoll(); }
+      let seed=[]; try{ seed=await (await fetch('seed-configs.json',{cache:'no-store'})).json() }catch(e){} const list={}; seed.forEach(c=>list[c.id]={...c,updatedAt:0});
+      GH.ok=true; onRemote(list,{fromCache:false}); setSync(GH.token?'off':'off',GH.token?'אין גישת כתיבה לריפו – בדקי את המפתח':'תצוגה בלבד – לחצי "חיבור לעריכה"'); GH.busy=false; return; }
+    if(!r.ok){ setSync('off',r.status===403?'הגעתן למגבלת הבקשות של GitHub – נסו שוב בעוד כמה דקות':(r.status===401?'המפתח לא תקין – לחצי "חיבור לעריכה"':'שגיאת GitHub '+r.status)); GH.busy=false; return; }
+    const files=(r.j||[]).filter(f=>f.type==='file'&&f.name.endsWith('.json')); const list={}; let changedAny=!GH.ok;
+    for(const f of files){ const id=f.name.replace(/\.json$/,''); const prev=GH.shas[id];
+      if(prev&&prev.sha===f.sha){ list[id]=prev.cfg; continue; }
+      const fr=await gh('/contents/'+GH.dir+'/'+encodeURIComponent(f.name)+'?ref='+GH.branch); if(!fr.ok) { if(prev) list[id]=prev.cfg; continue; }
+      try{ const v=JSON.parse(b64d(fr.j.content)); const cfg={id,name:v.name||'ללא שם',order:v.order||0,json:v.json,updatedAt:v.updatedAt||0}; GH.shas[id]={sha:fr.j.sha,cfg}; list[id]=cfg; changedAny=true; }catch(e){}
+    }
+    Object.keys(GH.shas).forEach(id=>{ if(!list[id]){ delete GH.shas[id]; changedAny=true; } });
+    // keep local changes that are still being written
+    Object.keys(Store.writing).forEach(id=>{ if(Store.writing[id]&&CFG.list[id]) list[id]=CFG.list[id]; });
+    GH.ok=true; if(changedAny) onRemote(list,{fromCache:false});
+    if(!Object.values(Store.writing).some(Boolean)) setSync(GH.token?'on':'off',GH.token?'משותף דרך GitHub · נשמר אוטומטית':'תצוגה בלבד – לחצי "חיבור לעריכה"');
+  }catch(e){ setSync('off','אין חיבור ל־GitHub'); }
+  GH.busy=false; }
+async function ghWrite(cfg,retry){ const path='/contents/'+GH.dir+'/'+cfg.id+'.json'; const body={message:'שמירה: '+cfg.name,branch:GH.branch,content:b64e(JSON.stringify({name:cfg.name,order:cfg.order,json:cfg.json,updatedAt:cfg.updatedAt},null,0))};
+  const known=GH.shas[cfg.id]; if(known) body.sha=known.sha;
+  let r=await gh(path,{method:'PUT',body});
+  if((r.status===409||r.status===422)&&!retry){ const cur=await gh(path+'?ref='+GH.branch); if(cur.ok){ GH.shas[cfg.id]={sha:cur.j.sha,cfg}; } else delete GH.shas[cfg.id]; return ghWrite(cfg,true); }
+  if(r.ok){ GH.shas[cfg.id]={sha:r.j.content.sha,cfg}; } return r; }
+async function ghDelete(id){ const k=GH.shas[id]; if(!k) return {ok:true}; const r=await gh('/contents/'+GH.dir+'/'+id+'.json',{method:'DELETE',body:{message:'מחיקה',branch:GH.branch,sha:k.sha}}); if(r.ok) delete GH.shas[id]; return r; }
+function openGhConnect(){ const has=!!GH.token; const link=location.origin+location.pathname+(GH.token?'#k='+encodeURIComponent(GH.token):'');
+  modal('חיבור לעריכה משותפת',`<p class="muted" style="margin-top:0;line-height:1.6">הקונפיגורציות נשמרות בריפו <b>${esc(GH.owner)}/${esc(GH.repo)}</b> (בענף <code>data</code>). כדי לשמור צריך מפתח גישה של GitHub (Fine-grained token) עם הרשאת <b>Contents: Read and write</b> לריפו הזה בלבד. בלי מפתח – תצוגה בלבד.</p>
+  <input id="ghTok" type="password" placeholder="github_pat_…" style="width:100%;background:#0f1215;border:1px solid var(--line);border-radius:8px;padding:8px" value="">
+  <div class="row" style="margin-top:12px;justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="btn pri" id="ghSave" style="flex:0">שמור וחבר</button>${has?'<button class="btn" id="ghCopy" style="flex:0">העתק קישור לשותפה</button><button class="btn" id="ghOut" style="flex:0">נתק מהמחשב הזה</button>':''}</div>
+  ${has?'<p class="muted" style="font-size:11.5px;margin-bottom:0">מחובר ✓. הקישור לשותפה כולל את המפתח – מי שמקבל אותו יכול לשנות קונפיגורציות בריפו הזה בלבד. שלחי אותו רק לה.</p>':''}`);
+  $('#ghSave').onclick=()=>{ const v=$('#ghTok').value.trim(); if(!v){closeModal();return} try{localStorage.setItem('kli-gh-token',v)}catch(e){} GH.token=v; GH.shas={}; GH.ok=false; closeModal(); setSync('busy','מתחבר…'); clearInterval(GH.timer); GH.timer=setInterval(()=>{ if(!document.hidden) ghPoll() },8000); ghPoll(); };
+  const cp=$('#ghCopy'); if(cp) cp.onclick=async()=>{ try{ await navigator.clipboard.writeText(link); toast('הקישור הועתק'); }catch(e){ prompt('העתיקי את הקישור:',link) } };
+  const out=$('#ghOut'); if(out) out.onclick=()=>{ try{localStorage.removeItem('kli-gh-token')}catch(e){} GH.token=''; closeModal(); ghPoll(); };
+}
+const Store={kind:'local',db:null,unsub:null,writing:{},pend:{},
+  async init(){
+    setSync('busy','מתחבר…');
+    if(ghOn()){ this.kind='gh'; const b=$('#bGh'); if(b) b.style.display=''; await ghPoll(); GH.timer=setInterval(()=>{ if(!document.hidden) ghPoll() },GH.token?8000:60000); window.addEventListener('focus',()=>ghPoll()); return; }
+    let db=null; try{ if(window.claude&&window.claude.use) db=await Promise.race([window.claude.use('db'),new Promise(r=>setTimeout(()=>r(null),10000))]); }catch(e){db=null}
+    if(db){ this.kind='db'; this.db=db; let got=false; const tm=setTimeout(()=>{if(!got) setSync('off','השמירה המשותפת לא זמינה כרגע')},10000);
+      this.unsub=db.collection('configs').onSnapshot(snap=>{ got=true; clearTimeout(tm);
+        const list={}; snap.docs.forEach(d=>{const v=d.data(); if(v&&v.json) list[d.id]={id:d.id,name:v.name||'ללא שם',order:v.order||0,json:v.json,updatedAt:v.updatedAt||0}});
+        onRemote(list,snap.metadata); setSync(snap.metadata.fromCache?'busy':'on',snap.metadata.fromCache?'מסתנכרן…':'משותף · נשמר אוטומטית');
+      },e=>{ clearTimeout(tm); setSync('off','שגיאת סנכרון: '+(e&&e.code||'')); this.kind='local'; this.loadLocal(); });
+    } else { this.kind='local'; this.loadLocal(); setSync('off','שמירה מקומית בדפדפן הזה בלבד'); }
+  },
+  loadLocal(){ let list={}; try{ list=JSON.parse(localStorage.getItem('kli-configs-v1')||'{}') }catch(e){} onRemote(list,{fromCache:false}); },
+  saveLocal(){ try{ localStorage.setItem('kli-configs-v1',JSON.stringify(CFG.list)) }catch(e){} },
+  async put(cfg){ CFG.list[cfg.id]=cfg;
+    if(this.kind==='gh'){ if(!GH.token){ setSync('off','תצוגה בלבד – השינוי לא נשמר. לחצי "חיבור לעריכה"'); return; }
+      if(this.writing[cfg.id]){this.pend[cfg.id]=cfg;return} this.writing[cfg.id]=true; setSync('busy','שומר…');
+      try{ const r=await ghWrite(cfg); setSync(r.ok?'on':'off', r.ok?'משותף דרך GitHub · נשמר':(r.status===401||r.status===403||r.status===404?'אין הרשאת כתיבה – בדקי את המפתח':'השמירה נכשלה ('+r.status+')')); }catch(e){ setSync('off','השמירה נכשלה – אין חיבור'); }
+      this.writing[cfg.id]=false; if(this.pend[cfg.id]){const n=this.pend[cfg.id];delete this.pend[cfg.id];this.put(n)} return; }
+    if(this.kind!=='db'){this.saveLocal();return}
+    if(this.writing[cfg.id]){this.pend[cfg.id]=cfg;return}
+    this.writing[cfg.id]=true; setSync('busy','שומר…');
+    try{ await this.db.doc('configs/'+cfg.id).set({name:cfg.name,order:cfg.order,json:cfg.json,updatedAt:cfg.updatedAt}); setSync('on','משותף · נשמר'); }
+    catch(e){ setSync('off', e&&e.code==='invalid_argument'?'אין לך הרשאת עריכה – תצוגה בלבד':'השמירה נכשלה ('+(e&&e.code||'')+')'); }
+    this.writing[cfg.id]=false; if(this.pend[cfg.id]){const n=this.pend[cfg.id];delete this.pend[cfg.id];this.put(n)}
+  },
+  async del(id){ delete CFG.list[id]; if(this.kind==='gh'){ if(!GH.token){toast('תצוגה בלבד');return} try{ const r=await ghDelete(id); if(!r.ok) toast('המחיקה נכשלה') }catch(e){toast('המחיקה נכשלה')} return; }
+    if(this.kind!=='db'){this.saveLocal();return} try{await this.db.doc('configs/'+id).delete()}catch(e){toast('המחיקה נכשלה')} }
+};
+let firstLoad=true, lastWritten={};
+function onRemote(list,meta){
+  const prevActive=CFG.active;
+  // keep local unsaved draft
+  CFG.list=list; const ids=Object.keys(list);
+  if(firstLoad&&!meta.fromCache){ firstLoad=false;
+    let want=null; try{want=localStorage.getItem('kli-active')}catch(e){}
+    if(ids.length){ CFG.active=list[want]?want:ids.sort((a,b)=>list[a].order-list[b].order)[0]; CFG.draft=false; loadCfg(CFG.active,true); }
+    else { CFG.active=uid(); CFG.draft=true; }
+  } else if(CFG.active&&list[CFG.active]&&!CFG.draft){
+    const remote=list[CFG.active].json; if(remote!==JSON.stringify(S)&&remote!==lastWritten[CFG.active]&&!drag){ hist.past.push(JSON.stringify(S)); S=hydrate(JSON.parse(remote)); resolve(S); changed(true); toast('הקונפיגורציה עודכנה מהמחשב השני'); }
+  } else if(CFG.active&&!list[CFG.active]&&!CFG.draft&&!firstLoad){ const ids2=Object.keys(list); if(ids2.length){CFG.active=ids2[0];loadCfg(CFG.active,true)} else {CFG.draft=true} }
+  renderTabs();
+}
+function hydrate(s){ const d=makeDefault(); s.comps.forEach(c=>{ const m=d.comps.find(k=>k.key===c.key&&(k.key!=='oak'||k.mount===c.mount))||d.comps.find(k=>k.key===c.key); if(!m) return;
+    ['note','link','model','ip','name','cat','shape'].forEach(f=>{ if(c[f]==null||c[f]==='') c[f]=m[f]; }); if(m.axis&&!c.axis&&c.key==='wsp'&&c.mount==='belly') c.axis=m.axis; if(c.fov===undefined) c.fov=m.fov; ['locked','wEst','pEst'].forEach(f=>{if(c[f]==null)c[f]=m[f]}); if(c.qty==null)c.qty=m.qty; });
+  s.rules=Object.assign(defaultRules(),s.rules||{}); s.accepted=s.accepted||{}; if(s.bin){ if(s.bin.slope==null) s.bin.slope=25; if(s.bin.actAng==null) s.bin.actAng=25; if(s.bin.floorAng==null) s.bin.floorAng=0; if(s.bin.floorPerp==null) s.bin.floorPerp=false; } return s; }
+function loadCfg(id,silent){ const c=CFG.list[id]; if(!c) return; try{ S=hydrate(JSON.parse(c.json)); }catch(e){ S=makeDefault(); }
+  S.rules=Object.assign(defaultRules(),S.rules||{}); S.accepted=S.accepted||{}; resolve(S); hist={past:[],future:[]}; UI.sel=null; CFG.active=id; CFG.draft=false;
+  try{localStorage.setItem('kli-active',id)}catch(e){} RES=compute(S); renderAll(); if(!silent) fitView(); }
+let saveT=null;
+function scheduleSave(){ clearTimeout(saveT); saveT=setTimeout(saveNow,700); }
+function saveNow(){ if(UI.mode==='present') return; const id=CFG.active||(CFG.active=uid()); const prev=CFG.list[id];
+  const json=JSON.stringify(S); lastWritten[id]=json;
+  const cfg={id,name:prev?prev.name:(CFG.draft?'שלדה כמו בתמונות':'קונפיגורציה'),order:prev?prev.order:Object.keys(CFG.list).length,json,updatedAt:Date.now()};
+  CFG.draft=false; Store.put(cfg); renderTabs(); }
+function setSync(cls,t){const e=$('#sync');e.className=cls;e.querySelector('span').textContent=t}
+let toastT; function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),2600)}
+
+/* ================== 3D engine (canvas, painter's algorithm) ================== */
+const cv=$('#cv'), ctx=cv.getContext('2d');
+let VW=0,VH=0,DPR=1;
+const ORB={yaw:-125,pitch:24,dist:260,t:[0,0,26]};
+const ORTHO={side:{s:3,c:[0,0,28]},top:{s:3,c:[0,0,0]},front:{s:3,c:[0,0,28]}};
+function hexRgb(h){const n=parseInt(h.slice(1),16);return [n>>16&255,n>>8&255,n&255]}
+function shadeCol(rgb,k,a){return `rgba(${rgb[0]*k|0},${rgb[1]*k|0},${rgb[2]*k|0},${a})`}
+const LIGHT=norm([-0.35,0.45,1]);
+let SCENE=null;
+function quad(out,a,b,c,d,col,o,nu=1,nv=1){
+  for(let i=0;i<nu;i++)for(let j=0;j<nv;j++){
+    const L=(u,v)=>{const p=add(mul(a,(1-u)*(1-v)),add(mul(b,u*(1-v)),add(mul(c,u*v),mul(d,(1-u)*v))));return p};
+    const u0=i/nu,u1=(i+1)/nu,v0=j/nv,v1=(j+1)/nv; out.push(poly([L(u0,v0),L(u1,v0),L(u1,v1),L(u0,v1)],col,o));
+  }
+}
+function poly(p,col,o={}){
+  const n=norm(cross(sub(p[1],p[0]),sub(p[2],p[0]))); const c=p.reduce((a,q)=>add(a,q),[0,0,0]).map(v=>v/p.length);
+  return {p,n,c,col,rgb:hexRgb(col),a:o.a==null?1:o.a,id:o.id||null,cull:o.cull!==false,edge:o.edge,sel:o.sel,flat:o.flat};
+}
+function orient(pl,center){ const v=sub(pl.c,center); if(dot(pl.n,v)<0){pl.p.reverse();pl.n=mul(pl.n,-1)} return pl; }
+function boxGeo(out,b,col,o={},xf){
+  const P=[[b.x0,b.y0,b.z0],[b.x1,b.y0,b.z0],[b.x1,b.y1,b.z0],[b.x0,b.y1,b.z0],[b.x0,b.y0,b.z1],[b.x1,b.y0,b.z1],[b.x1,b.y1,b.z1],[b.x0,b.y1,b.z1]].map(p=>xf?xf(p):p);
+  const ctr=xf?xf([(b.x0+b.x1)/2,(b.y0+b.y1)/2,(b.z0+b.z1)/2]):[(b.x0+b.x1)/2,(b.y0+b.y1)/2,(b.z0+b.z1)/2];
+  const sub_=o.sub||0, lx=b.x1-b.x0,ly=b.y1-b.y0,lz=b.z1-b.z0, n=v=>sub_?Math.max(1,Math.ceil(v/sub_)):1;
+  const faces=[[0,1,2,3,lx,ly,'bot'],[4,5,6,7,lx,ly,'top'],[0,1,5,4,lx,lz],[1,2,6,5,ly,lz],[2,3,7,6,lx,lz],[3,0,4,7,ly,lz]];
+  faces.forEach(f=>{ if(o.open==='top'&&f[6]==='top') return; const tmp=[]; quad(tmp,P[f[0]],P[f[1]],P[f[2]],P[f[3]],col,o,n(f[4]),n(f[5])); tmp.forEach(pl=>out.push(orient(pl,ctr))); });
+}
+function prismGeo(out,pr,y0,y1,col,o={},xf){ // closed prism from an (x,z) polygon
+  const T=p=>xf?xf(p):p, c2=polyCent(pr), ctr=T([c2[0],(y0+y1)/2,c2[1]]);
+  for(let i=0;i<pr.length;i++){ const a=pr[i],c=pr[(i+1)%pr.length], tmp=[]; quad(tmp,T([a[0],y0,a[1]]),T([c[0],y0,c[1]]),T([c[0],y1,c[1]]),T([a[0],y1,a[1]]),col,o,Math.max(1,Math.ceil(Math.hypot(c[0]-a[0],c[1]-a[1])/10)),Math.max(1,Math.ceil((y1-y0)/10))); tmp.forEach(pl=>out.push(orient(pl,ctr))); }
+  [y0,y1].forEach(y=>out.push(orient(poly(pr.map(v=>T([v[0],y,v[1]])),col,o),ctr)));
+}
+function binGeo(out,s,c,col,o={},xf){ // open-top bin prism from its side profile
+  const pr=binProfile(s,c), y0=c.y-c.W/2, y1=c.y+c.W/2, T=p=>xf?xf(p):p;
+  const P=k=>[T([pr[k][0],y0,pr[k][1]]),T([pr[k][0],y1,pr[k][1]])];
+  const ctr=T([c.x,c.y,c.z+c.H/2]), n=v=>Math.max(1,Math.ceil(v/10)), d=(i,j)=>Math.hypot(pr[i][0]-pr[j][0],pr[i][1]-pr[j][1]);
+  [[0,1],[1,2],[3,0]].forEach(([i,j])=>{ const A=P(i),B=P(j),tmp=[]; quad(tmp,A[0],B[0],B[1],A[1],col,o,n(d(i,j)),n(c.W)); tmp.forEach(pl=>out.push(orient(pl,ctr))); });
+  [y0,y1].forEach(y=>{ const q=pr.map(v=>T([v[0],y,v[1]])), tmp=[]; quad(tmp,q[0],q[1],q[2],q[3],col,o,n(c.L),n(c.H)); tmp.forEach(pl=>out.push(orient(pl,ctr))); });
+}
+function cylGeo(out,base,axis,r,h,col,o={},n=16){
+  axis=norm(axis); const a=Math.abs(axis[2])<.9?[0,0,1]:[1,0,0]; const e1=norm(cross(axis,a)),e2=cross(axis,e1);
+  const top=add(base,mul(axis,h)), ctr=add(base,mul(axis,h/2)), ring=(c)=>{const o2=[];for(let i=0;i<n;i++){const t=i/n*2*Math.PI;o2.push(add(c,add(mul(e1,Math.cos(t)*r),mul(e2,Math.sin(t)*r))))}return o2};
+  const A=ring(base),B=ring(top); const segs=o.sub?Math.max(1,Math.ceil(h/o.sub)):1;
+  for(let i=0;i<n;i++){const j=(i+1)%n; for(let k=0;k<segs;k++){const t0=k/segs,t1=(k+1)/segs; const m=(P,Q,t)=>add(P,mul(sub(Q,P),t));
+    out.push(orient(poly([m(A[i],B[i],t0),m(A[j],B[j],t0),m(A[j],B[j],t1),m(A[i],B[i],t1)],col,o),ctr));}}
+  if(!o.noCaps){ out.push(orient(poly(A.slice(),o.capCol||col,o),ctr)); out.push(orient(poly(B.slice(),o.capCol||col,o),ctr)); }
+}
+function ellGeo(out,c,rx,ry,rz,col,o={}){
+  const nl=7,nm=12; const P=(i,j)=>{const th=i/nl*Math.PI, ph=j/nm*2*Math.PI;return [c[0]+rx*Math.sin(th)*Math.cos(ph),c[1]+ry*Math.sin(th)*Math.sin(ph),c[2]+rz*Math.cos(th)]};
+  for(let i=0;i<nl;i++)for(let j=0;j<nm;j++){const q=[P(i,j),P(i+1,j),P(i+1,j+1),P(i,j+1)]; if(i===0)q.splice(0,1); else if(i===nl-1)q.splice(2,1);
+    if(q.length>=3) out.push(orient(poly(q,col,o),c));}
+}
+
+function buildScene(){
+  const s=S, polys=[], lines=[], labels=[], fills=[], shadows=[];
+  const sel=UI.sel, warn=RES.warnIds, chCol=s.ch.mat==='alu'?'#b9c3cf':'#7f8a99';
+  const ghost=UI.render==='ghost', skel=UI.render==='skel';
+  const A_=(id,base)=>ghost&&!String(id).startsWith('ch-')?0.35:base;
+  // chassis
+  const art=rockerOn(s)?(UI.art||0):0;
+  chassisParts(s,art).forEach(p=>{ if(p.rock){ boxGeo(polys,p.b0,'#c9792f',{id:'chassis',sub:10},q=>rockPt(s,q,p.rock,art)); shadows.push(p.b); return; }
+    boxGeo(polys,p.b,p.id==='ch-pivot'?'#ff8a4c':p.id.startsWith('ch-br')||p.id.startsWith('ch-mb')?'#5d6672':chCol,{id:'chassis',sub:10}); shadows.push(p.b); });
+  if(art) wheelBoxes(s,art).forEach(w=>{ const R=s.ch.wheelD/2, bot=w.z-R; if(bot>0.3) boxGeo(polys,{x0:w.x-R*0.9,x1:w.x+R*0.9,y0:w.y-s.ch.tireW,y1:w.y+s.ch.tireW,z0:0,z1:bot},'#6b5236',{id:null}); });
+  // wheels
+  const wc=byKey(s,'wheel'); wheelBoxes(s,art).forEach(w=>{ const R=s.ch.wheelD/2; const g=w.y>0?1:-1;
+    if(!skel){ cylGeo(polys,[w.x,w.y-g*s.ch.tireW/2,w.z],[0,g,0],R,s.ch.tireW,'#25282e',{id:wc?.id,capCol:'#3a3e46',a:A_(wc?.id,1)},22);
+      cylGeo(polys,[w.x,w.y+g*(s.ch.tireW/2),w.z],[0,g,0],R*0.42,0.6,'#aab2bd',{id:wc?.id,a:A_(wc?.id,1)},14);}
+    shadows.push(w.b); });
+  // components
+  s.comps.forEach(c=>{
+    if(skel&&c.cat!=='arm') return;
+    const col=CAT[c.cat].c, id=c.id, a=A_(id,1);
+    if(c.shape==='box'){ if(c.mount==='bin'&&byKey(s,'bin')) boxGeo(polys,binMountLocal(s,c,byKey(s,'bin')),col,{id,a},binMountXf(s,s.bin.tilt)); else boxGeo(polys,boxOf(c),col,{id,a,sub:c.L>20?10:0}); shadows.push(boxOf(c)); }
+    else if(c.shape==='cyl'){ cylGeo(polys,[c.x,c.y,c.z],[0,0,1],c.L/2,c.H,col,{id,a},14); if(c.key==='estop') cylGeo(polys,[c.x,c.y,c.z+c.H],[0,0,1],c.L/2*0.85,1.6,'#ffd23f',{id,a},14);
+      if(c.key==='signal'){['#57c97a','#f6b73c','#ff5a4e','#4fb3ff'].forEach((k,i)=>cylGeo(polys,[c.x,c.y,c.z+c.H*0.25+i*c.H*0.16],[0,0,1],c.L/2+0.05,c.H*0.14,k,{id,a},14));}
+      shadows.push(boxOf(c)); }
+    else if(c.shape==='lidar'){ cylGeo(polys,[c.x,c.y,c.z],[0,0,1],c.L/2,c.H*0.35,'#3b3f4a',{id,a},18); cylGeo(polys,[c.x,c.y,c.z+c.H*0.35],[0,0,1],c.L/2*0.96,c.H*0.5,'#1d2027',{id,a,capCol:'#2a2e36'},18); cylGeo(polys,[c.x,c.y,c.z+c.H*0.85],[0,0,1],c.L/2,c.H*0.15,col,{id,a},18); }
+    else if(c.shape==='camera'){ boxGeo(polys,boxOf(c),'#3a3550',{id,a}); const f=c.fov; const dx=Math.cos(f.yaw*D),dy=Math.sin(f.yaw*D); const fc=[c.x+dx*c.L/2,c.y+dy*c.L/2,c.z+c.H/2];
+      [-3.75,0,3.75].forEach(k=>cylGeo(polys,add(fc,[-dy*k,dx*k,0]),[dx,dy,0],0.9,0.3,k?'#111':col,{id,a},10)); }
+    else if(c.shape==='disc'&&c.axis==='z'){ cylGeo(polys,[c.x,c.y,c.z],[0,0,1],c.L/2,c.H,col,{id,a,capCol:'#2f7fc1'},20); }
+    else if(c.shape==='disc'){ const sg=c.mount==='front'?1:-1; cylGeo(polys,[c.x-sg*c.L/2,c.y,c.z+c.H/2],[sg,0,0],c.W/2,c.L,col,{id,a,capCol:'#2f7fc1'},20); }
+    else if(c.shape==='antenna'){ cylGeo(polys,[c.x,c.y,c.z],[0,0,1],7.5,0.4,'#9aa3ad',{id,a},18); boxGeo(polys,{x0:c.x-4.1,x1:c.x+4.1,y0:c.y-3,y1:c.y+3,z0:c.z+0.4,z1:c.z+c.H},col,{id,a}); }
+    else if(c.shape==='bin'){ const th=s.bin.tilt; const xf=th?(p=>rotBin(s,p,th)):null; const b=boxOf(c);
+      binGeo(polys,s,c,col,{id,a:A_(id,0.42),cull:false},xf);
+      if(s.bin.fill>0){const h=fillH(s,s.bin.fill), pr=binProfile(s,c), cz=pr.reduce((m,v)=>Math.max(m,v[1]),-1e9); const fp=clipBelow(pr,c.z+0.8+h); if(fp.length>=3){ const cc=polyCent(fp); const sh=fp.map(v=>[cc[0]+(v[0]-cc[0])*0.94,cc[1]+(v[1]-cc[1])*0.94]); prismGeo(polys,sh,b.y0+1.5,b.y1-1.5,'#3f9a3a',{id,a},xf);} }
+      shadows.push(b); }
+    else if(c.shape==='actuator'){ const g=actGeom(s,s.bin.tilt); const d=sub(g.A,g.B), L=len(d), ax=norm(d);
+      cylGeo(polys,g.B,ax,1.6,Math.min(L,s.bin.actClosed*0.62),'#c8792f',{id,a},10); cylGeo(polys,add(g.B,mul(ax,s.bin.actClosed*0.62)),ax,0.7,Math.max(0.5,L-s.bin.actClosed*0.62),'#d9dde3',{id,a},8); }
+    else if(c.shape==='arm'){ drawArm(polys,c,a); }
+    if(UI.labels&&c.shape!=='none'&&c.mount!=='wheels') labels.push({p:[c.x,c.y,c.z+c.H+(c.shape==='arm'?45:3)],t:c.name,col});
+  });
+  // bushes & targets
+  if(UI.bushes){ const R=s.rules, yb=R.pathW/2+28; for(let x=-159;x<=160;x+=53)[1,-1].forEach(g=>ellGeo(polys,[x,g*yb,R.bushH*0.47],24,27,R.bushH*0.5,'#3d7a43',{id:null,a:0.16,flat:true}));
+    (RES.reach||[]).forEach(t=>{ if(t.k==='drop') return; cylGeo(polys,add(t.p,[0,0,-1.5]),[0,0,1],1.6,3,t.ok?'#7bd389':'#ff5a4e',{id:null},8); }); }
+  SCENE={polys,lines,labels,fills,shadows};
+  overlays(SCENE);
+  return SCENE;
+}
+function drawArm(polys,c,a){
+  const s=S, P=fk(s,s.arm), id=c.id, w='#e9e6e1', j='#ff5a4e', dk='#3b3f46';
+  cylGeo(polys,[c.x,c.y,c.z],[0,0,1],4.15,12.8,dk,{id,a},16);
+  cylGeo(polys,[c.x,c.y,c.z+12.8],[0,0,1],4.6,24.3-12.8-2,w,{id,a},16);
+  cylGeo(polys,add(P.S,[0,0,-2.5]),[0,0,1],5.6,3,j,{id,a},16);
+  const seg=(A,B,r,col)=>{const d=sub(B,A);cylGeo(polys,A,d,r,len(d),col,{id,a,sub:9},12)};
+  seg(P.S,P.p1,3.4,w); seg(P.p1,P.p2,3.3,w); seg(P.p2,P.p3,2.6,w);
+  const side=norm(cross(P.u,[0,0,1]));
+  [P.p1,P.p2].forEach(q=>cylGeo(polys,add(q,mul(side,-3.9)),side,3.9,7.8,j,{id,a},14));
+  const dirT=norm(sub(P.p3,P.p2)); const up=norm(cross(side,dirT));
+  [1,-1].forEach(g=>{const b0=add(P.p3,mul(side,g*1.9)); const tip=add(b0,mul(dirT,4.2)); seg(b0,tip,0.55,'#ffb000')});
+  boxGeo(polys,{x0:-2.1,x1:2.1,y0:-2.1,y1:2.1,z0:-1.15,z1:1.15},'#9b8cff',{id,a},p=>add(add(P.p2,mul(dirT,6)),add(add(mul(side,p[0]),mul(up,p[2]+3.6)),mul(dirT,p[1]))));
+}
+function overlays(sc){
+  const s=S, L=sc.lines, F=sc.fills, lab=sc.labels;
+  // FOV
+  const show=c=>UI.fovMode==='all'||(UI.fovMode==='sel'&&UI.sel===c.id);
+  s.comps.filter(c=>c.fov).forEach(c=>{ if(!show(c)) return;
+    if(c.fov.type==='lidar'&&RES.lidar){ const lr=RES.lidar, C=lr.c, R=Math.min(c.fov.range,70);
+      const ring=(el,col,a)=>{const pts=[];for(let i=0;i<=72;i++){const t=i/72*2*Math.PI;pts.push(add(C,[Math.cos(t)*R*Math.cos(el*D),Math.sin(t)*R*Math.cos(el*D),R*Math.sin(el*D)]))}
+        for(let i=0;i<72;i++){F.push({p:[C,pts[i],pts[i+1]],col,a});} return pts};
+      const up=ring(c.fov.vmax,'#9b8cff',0.07), dn=ring(c.fov.vmin,'#9b8cff',0.10);
+      for(let i=0;i<72;i++){L.push({a:up[i],b:up[i+1],col:'rgba(155,140,255,.7)',w:1});L.push({a:dn[i],b:dn[i+1],col:'rgba(155,140,255,.7)',w:1})}
+      for(let i=0;i<lr.NA;i++){ if(lr.cols[i]<0.25) continue; const t=(i*2+1)*D, rr=R*Math.cos(c.fov.vmin*D)+2;
+        L.push({a:[C[0]+Math.cos(t)*rr*0.35,C[1]+Math.sin(t)*rr*0.35,C[2]],b:[C[0]+Math.cos(t)*rr,C[1]+Math.sin(t)*rr,C[2]+R*Math.sin(c.fov.vmin*D)],col:`rgba(255,90,78,${0.25+lr.cols[i]*0.6})`,w:2}); }
+      lab.push({p:add(C,[0,0,R*Math.sin(c.fov.vmax*D)+4]),t:`LiDAR · ${fmt(lr.pct,1)}% מוסתר`,col:'#c9c0ff'});
+    }
+    if(c.fov.type==='cam'){ const cm=(RES.cams||[]).find(k=>k.id===c.id); if(!cm) return; const f=cm.f,R=f.range;
+      const corners=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([a,b])=>{const tx=Math.tan(f.h/2*D)*a,ty=Math.tan(f.v/2*D)*b; const d=norm(add(cm.fw,add(mul(cm.rt,tx),mul(cm.up,ty)))); return add(cm.P,mul(d,R))});
+      const col=cm.hit.length?'#ff5a4e':'#9b8cff';
+      corners.forEach((q,i)=>{L.push({a:cm.P,b:q,col,w:1});L.push({a:q,b:corners[(i+1)%4],col,w:1});F.push({p:[cm.P,q,corners[(i+1)%4]],col,a:0.07})});
+      const gd=cm.gd; if(isFinite(gd)){ const dx=Math.cos(f.yaw*D),dy=Math.sin(f.yaw*D); const ex=cm.gd-cm.blind; const w=20;
+        const a0=[cm.P[0]+dx*ex,cm.P[1]+dy*ex,0.2],a1=[cm.P[0]+dx*gd,cm.P[1]+dy*gd,0.2];
+        F.push({p:[add(a0,[-dy*w,dx*w,0]),add(a1,[-dy*w,dx*w,0]),add(a1,[dy*w,-dx*w,0]),add(a0,[dy*w,-dx*w,0])],col:'#ff5a4e',a:0.18});
+        lab.push({p:add(a1,[dx*4,dy*4,0]),t:`עיוור ${fmt(Math.max(0,cm.blind))} ס״מ`,col:'#ff8a80'}); }
+    }
+  });
+  // reach
+  if(UI.reach&&RES.reach){ const A=armBase(s); if(A){ const Sx=[A.x,A.y,A.z+24.3];
+    const pts=[]; for(let i=0;i<=60;i++){const t=i/60*2*Math.PI; pts.push(add(Sx,[0,Math.cos(t)*76,Math.sin(t)*76]))}
+    for(let i=0;i<60;i++) L.push({a:pts[i],b:pts[i+1],col:'rgba(246,183,60,.35)',w:1,dash:[4,4]});
+    RES.reach.forEach(t=>{ const P=t.pose?fk(s,t.pose):null; if(UI.sel===A.id&&P){[P.S,P.p1,P.p2,P.p3].reduce((a,b)=>{L.push({a,b,col:t.ok?'rgba(123,211,137,.55)':'rgba(255,90,78,.6)',w:2,dash:[3,3]});return b})}
+      if(t.k==='drop'){ L.push({a:add(t.p,[-2,0,0]),b:add(t.p,[2,0,0]),col:t.ok?'#7bd389':'#ff5a4e',w:2}); L.push({a:add(t.p,[0,-2,0]),b:add(t.p,[0,2,0]),col:t.ok?'#7bd389':'#ff5a4e',w:2}); }
+    }); } }
+  // cables
+  if(UI.cables!=='none'){ const e=byKey(s,'ebox'),b=byKey(s,'battery'); const ct=c=>[c.x,c.y,c.z+c.H/2]; const tz=chTop(s)+1;
+    const route=(A,B,col,dash)=>{const p=[A,[A[0],A[1],tz],[B[0],A[1],tz],[B[0],B[1],tz],B];for(let i=0;i<4;i++)L.push({a:p[i],b:p[i+1],col,w:2,dash})};
+    if(e&&(UI.cables==='data'||UI.cables==='both')) s.comps.filter(c=>['lidar','oak','rtk','loadcell','roboteq','arm','signal','estop'].includes(c.key)).forEach(c=>route(ct(e),c.shape==='arm'?[c.x,c.y,c.z+2]:ct(c),'#b6a9ff',[5,4]));
+    if(b&&(UI.cables==='power'||UI.cables==='both')) s.comps.filter(c=>['ebox','roboteq','arm','wsb','actuator','signal'].includes(c.key)).forEach(c=>route(ct(b),c.shape==='arm'?[c.x,c.y,c.z+2]:(c.shape==='actuator'?actGeom(s,0).B:ct(c)),'#f6b73c',null));
+    if(b) s.comps.filter(c=>c.key==='roboteq').forEach(c=>wheelBoxes(s).filter(w=>Math.sign(w.x-c.x)===Math.sign(w.x)||true).slice(0,0));
+  }
+  // direction arrow
+  if(UI.arrows){ const x=s.ch.L/2+22, z=0.3; L.push({a:[x-14,0,z],b:[x+6,0,z],col:'#f6b73c',w:3}); L.push({a:[x+6,0,z],b:[x,4,z],col:'#f6b73c',w:3}); L.push({a:[x+6,0,z],b:[x,-4,z],col:'#f6b73c',w:3}); lab.push({p:[x+12,0,z],t:'קדימה',col:'#f6b73c'}); }
+  // dimensions
+  if(UI.dims){ const k=RES.kpi, c=s.ch, {xf,xr}=axles(s), yw=-(totalWidthWheels(s)/2+12), dcol='#e9ebee';
+    const dim=(a,b,t,off)=>{L.push({a,b,col:dcol,w:1});const d=norm(sub(b,a));const n=off||[0,0,2];[a,b].forEach(p=>L.push({a:add(p,mul(n,-1)),b:add(p,n),col:dcol,w:1}));lab.push({p:mul(add(a,b),.5),t,col:dcol,bg:true})};
+    dim([-c.L/2,yw,0.3],[c.L/2,yw,0.3],`אורך שלדה ${fmt(c.L)}`,[0,2,0]);
+    dim([xr,yw-10,0.3],[xf,yw-10,0.3],`בין צירים ${fmt(c.WB)}`,[0,2,0]);
+    const xw=xf+s.ch.wheelD/2+14; dim([xw,-totalWidthWheels(s)/2,0.3],[xw,totalWidthWheels(s)/2,0.3],`רוחב ${fmt(totalWidthWheels(s))}`,[2,0,0]);
+    dim([xw+10,-trackW(s)/2,0.3],[xw+10,trackW(s)/2,0.3],`בין גלגלים ${fmt(trackW(s))}`,[2,0,0]);
+    dim([-c.L/2-18,yw,0],[-c.L/2-18,yw,k.Ht],`גובה ${fmt(k.Ht)}`,[2,0,0]);
+    dim([0,yw,0],[0,yw,c.clear],`מרווח ${fmt(c.clear)}`,[2,0,0]);
+  }
+}
+
+/* ---------- cameras & projection ---------- */
+function viewports(){
+  const W=VW,H=VH;
+  if(UI.view!=='all') return [{kind:UI.view,x:0,y:0,w:W,h:H}];
+  const w=W/2,h=H/2; return [{kind:'3d',x:w,y:0,w,h},{kind:'side',x:0,y:0,w,h},{kind:'top',x:w,y:h,w,h},{kind:'front',x:0,y:h,w,h}];
+}
+function camFor(vp){
+  const cx=vp.x+vp.w/2, cy=vp.y+vp.h/2;
+  if(vp.kind==='3d'){ const y=ORB.yaw*D,p=ORB.pitch*D; const dir=[Math.cos(p)*Math.cos(y),Math.cos(p)*Math.sin(y),Math.sin(p)];
+    const pos=add(ORB.t,mul(dir,ORB.dist)); const f=mul(dir,-1); const r=norm(cross(f,[0,0,1])); const u=cross(r,f);
+    const foc=vp.h/(2*Math.tan(20*D)); return {persp:true,pos,f,r,u,foc,cx,cy,vp}; }
+  const O=ORTHO[vp.kind]; let f,u;
+  if(vp.kind==='side'){f=[0,1,0];u=[0,0,1]} else if(vp.kind==='top'){f=[0,0,-1];u=[0,1,0]} else {f=[-1,0,0];u=[0,0,1]}
+  const r=cross(f,u); const pos=add(O.c,mul(f,-2000)); return {persp:false,pos,f,r,u,sc:O.s*(vp.h/600),cx,cy,vp,C:O.c};
+}
+function proj(cam,p){ const d=sub(p,cam.pos), z=dot(d,cam.f);
+  if(cam.persp){ if(z<5) return null; const k=cam.foc/z; return [cam.cx+dot(d,cam.r)*k, cam.cy-dot(d,cam.u)*k, z]; }
+  return [cam.cx+dot(sub(p,cam.C),cam.r)*cam.sc, cam.cy-dot(sub(p,cam.C),cam.u)*cam.sc, z]; }
+function rayFor(cam,sx,sy){
+  if(cam.persp){ const d=norm(add(cam.f,add(mul(cam.r,(sx-cam.cx)/cam.foc),mul(cam.u,-(sy-cam.cy)/cam.foc)))); return {o:cam.pos,d}; }
+  const o=add(cam.C,add(mul(cam.r,(sx-cam.cx)/cam.sc),add(mul(cam.u,-(sy-cam.cy)/cam.sc),mul(cam.f,-2000)))); return {o,d:cam.f}; }
+function rayPlane(ray,P,n){ const dn=dot(ray.d,n); if(Math.abs(dn)<1e-6) return null; const t=dot(sub(P,ray.o),n)/dn; if(t<0) return null; return add(ray.o,mul(ray.d,t)); }
+
+let PICK=[];
+function draw(){
+  if(!SCENE) buildScene();
+  const dpr=DPR; ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,VW,VH);
+  PICK=[];
+  viewports().forEach(vp=>{ ctx.save(); ctx.beginPath(); ctx.rect(vp.x,vp.y,vp.w,vp.h); ctx.clip(); drawVP(vp); ctx.restore();
+    if(UI.view==='all'){ ctx.strokeStyle='#2a3138'; ctx.lineWidth=1; ctx.strokeRect(vp.x+.5,vp.y+.5,vp.w-1,vp.h-1);
+      ctx.fillStyle='#8e979f'; ctx.font='12px Rubik'; ctx.textAlign='right'; ctx.direction='rtl'; ctx.fillText({'3d':'תלת־ממד',side:'צד',top:'מלמעלה',front:'חזית'}[vp.kind],vp.x+vp.w-10,vp.y+18); } });
+}
+function drawVP(vp){
+  const cam=camFor(vp), sc=SCENE;
+  // ground
+  const G=200, gp=[[-G,-G,0],[G,-G,0],[G,G,0],[-G,G,0]];
+  if(vp.kind!=='side'&&vp.kind!=='front'){ fillPoly(cam,gp,'rgba(28,34,39,1)'); const pw=S.rules.pathW/2; fillPoly(cam,[[-G,-pw,0],[G,-pw,0],[G,pw,0],[-G,pw,0]],'rgba(48,40,30,.55)'); }
+  ctx.lineWidth=1;
+  for(let i=-G;i<=G;i+=10){ const strong=i%50===0; ctx.strokeStyle=strong?'rgba(70,80,90,.55)':'rgba(55,63,71,.35)';
+    if(vp.kind==='side'||vp.kind==='front'){ if(i===0){ const a=proj(cam,[-G,-G,0]),b=proj(cam,[G,G,0]); if(a&&b){ctx.strokeStyle='#4a535c';ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()} } continue; }
+    segLine(cam,[i,-G,0],[i,G,0],20); segLine(cam,[-G,i,0],[G,i,0],20); }
+  if(vp.kind!=='side'&&vp.kind!=='front') sc.shadows.forEach(b=>fillPoly(cam,[[b.x0-1,b.y0-1,0.05],[b.x1+1,b.y0-1,0.05],[b.x1+1,b.y1+1,0.05],[b.x0-1,b.y1+1,0.05]],'rgba(0,0,0,.22)'));
+  // polys
+  const list=[];
+  for(const pl of sc.polys){
+    if(pl.cull){ const v=cam.persp?sub(pl.c,cam.pos):cam.f; if(dot(pl.n,v)>=0) continue; }
+    const sp=[]; let ok=true, zs=0; for(const q of pl.p){const r=proj(cam,q); if(!r){ok=false;break} sp.push(r); zs+=r[2]} if(!ok) continue;
+    const zc=proj(cam,pl.c); list.push({pl,sp,z:zc?zc[2]:zs/sp.length});
+  }
+  list.sort((a,b)=>b.z-a.z);
+  const selId=UI.sel, warn=RES.warnIds;
+  for(const it of list){ const pl=it.pl; let k=0.55+0.45*Math.max(0,dot(pl.n,LIGHT)); if(!pl.cull) k=0.75+0.25*Math.abs(dot(pl.n,LIGHT));
+    const isSel=pl.id&&pl.id===selId; let rgb=pl.rgb; if(isSel) rgb=rgb.map(v=>Math.min(255,v*1.15+18));
+    ctx.beginPath(); it.sp.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1])); ctx.closePath();
+    ctx.fillStyle=shadeCol(rgb,k,pl.a); ctx.fill();
+    ctx.strokeStyle=pl.flat?'rgba(90,160,95,.10)':isSel?'rgba(246,183,60,.95)':(pl.id&&warn.has(pl.id)&&UI.mode==='design'?'rgba(255,90,78,.55)':`rgba(0,0,0,${pl.a<1?0.12:0.22})`); ctx.lineWidth=isSel?1.4:0.6; ctx.stroke();
+    if(pl.id) PICK.push({sp:it.sp,id:pl.id,vp});
+  }
+  // overlay fills & lines
+  sc.fills.forEach(f=>fillPoly(cam,f.p,hexA(f.col,f.a)));
+  sc.lines.forEach(l=>{const a=proj(cam,l.a),b=proj(cam,l.b); if(!a||!b) return; ctx.strokeStyle=l.col; ctx.lineWidth=l.w||1; ctx.setLineDash(l.dash||[]); ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); ctx.setLineDash([]);});
+  ctx.font='11.5px Rubik'; ctx.direction='rtl'; ctx.textAlign='center';
+  sc.labels.forEach(l=>{const a=proj(cam,l.p); if(!a) return; const w=ctx.measureText(l.t).width+10; ctx.fillStyle='rgba(14,17,19,.78)'; roundRect(a[0]-w/2,a[1]-9,w,17,5); ctx.fill(); ctx.fillStyle=l.col||'#e9ebee'; ctx.fillText(l.t,a[0],a[1]+3.5);});
+  if(vp.kind==='3d') axisGizmo(cam,vp);
+}
+function hexA(h,a){const c=hexRgb(h);return `rgba(${c[0]},${c[1]},${c[2]},${a})`}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function fillPoly(cam,pts,col){const sp=pts.map(p=>proj(cam,p)); if(sp.some(q=>!q)) return; ctx.beginPath(); sp.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1])); ctx.closePath(); ctx.fillStyle=col; ctx.fill();}
+function segLine(cam,a,b,n){ ctx.beginPath(); let pen=false; for(let i=0;i<=n;i++){const p=proj(cam,add(a,mul(sub(b,a),i/n))); if(!p){pen=false;continue} if(pen)ctx.lineTo(p[0],p[1]); else {ctx.moveTo(p[0],p[1]);pen=true}} ctx.stroke(); }
+function axisGizmo(cam,vp){ const o=[vp.x+vp.w-46,vp.y+vp.h-46]; [[[1,0,0],'#ff5a4e','קדימה'],[[0,1,0],'#7bd389','שמאל'],[[0,0,1],'#4fb3ff','למעלה']].forEach(([d,c,t])=>{
+  const x=dot(d,cam.r)*24, y=-dot(d,cam.u)*24; ctx.strokeStyle=c; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(o[0],o[1]); ctx.lineTo(o[0]+x,o[1]+y); ctx.stroke(); ctx.fillStyle=c; ctx.font='10px Rubik'; ctx.fillText(t,o[0]+x*1.35,o[1]+y*1.35+3); }); }
+function rerender(){ buildScene(); draw(); }
+
+function pickAt(x,y){
+  for(let i=PICK.length-1;i>=0;i--){const it=PICK[i]; if(x<it.vp.x||x>it.vp.x+it.vp.w||y<it.vp.y||y>it.vp.y+it.vp.h) continue; if(pip(x,y,it.sp)) return it.id;}
+  return null;
+}
+function pip(x,y,p){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){if(((p[i][1]>y)!==(p[j][1]>y))&&(x<(p[j][0]-p[i][0])*(y-p[i][1])/(p[j][1]-p[i][1])+p[i][0]))c=!c}return c}
+function vpAt(x,y){return viewports().find(v=>x>=v.x&&x<=v.x+v.w&&y>=v.y&&y<=v.y+v.h)}
+
+/* ---------- interaction ---------- */
+let drag=null;
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+cv.addEventListener('pointerdown',e=>{
+  const r=cv.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top; const vp=vpAt(x,y); if(!vp) return;
+  cv.setPointerCapture(e.pointerId);
+  const id=e.button===0?pickAt(x,y):null; const c=id&&S.comps.find(k=>k.id===id);
+  if(c){ UI.sel=c.id; renderSide(); }
+  else if(e.button===0&&id!=='chassis'){ /* keep selection on background drag */ }
+  if(id==='chassis'&&e.button===0){ UI.sel=null; renderSide(); }
+  const movable=c&&UI.mode==='design'&&!c.locked&&!['wheels','armtip','arm','binact'].includes(c.mount)&&c.shape!=='none';
+  if(movable){ const cam=camFor(vp); const ctr=[c.x,c.y,c.z+c.H/2];
+    const vertical=e.shiftKey; let n; if(cam.persp&&!vertical) n=[0,0,1]; else if(cam.persp){const h=[cam.f[0],cam.f[1],0]; n=norm(h)} else n=mul(cam.f,-1);
+    const P0=cam.persp&&!vertical?[c.x,c.y,c.z]:ctr; const hit=rayPlane(rayFor(cam,x,y),P0,n); if(!hit) return;
+    drag={type:'comp',id:c.id,vp,n,P0,hit0:hit,start:[c.x,c.y,c.z],before:JSON.stringify(S),vertical,moved:false};
+  } else { drag={type:(e.button===2||e.button===1||vp.kind!=='3d')?'pan':'orbit',vp,x,y,yaw:ORB.yaw,pitch:ORB.pitch,t:ORB.t.slice(),oc:vp.kind!=='3d'?ORTHO[vp.kind].c.slice():null,click:!id,clickId:id}; }
+  draw();
+});
+cv.addEventListener('pointermove',e=>{
+  const r=cv.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
+  if(!drag){ const id=pickAt(x,y); cv.style.cursor=id&&id!=='chassis'&&UI.mode==='design'?'grab':'default'; showTip(id,x,y); return; }
+  hideTip();
+  if(drag.type==='comp'){ const c=S.comps.find(k=>k.id===drag.id); const cam=camFor(drag.vp); const hit=rayPlane(rayFor(cam,x,y),drag.P0,drag.n); if(!hit) return;
+    const d=sub(hit,drag.hit0); const snap=v=>Math.round(v*2)/2;
+    let nx=drag.start[0]+d[0], ny=drag.start[1]+d[1], nz=drag.start[2]+d[2];
+    if(cam.persp&&!drag.vertical){nz=drag.start[2]}
+    if(cam.persp&&drag.vertical){nx=drag.start[0];ny=drag.start[1]}
+    nx=snap(nx);ny=snap(ny);nz=snap(nz);
+    const old=[c.x,c.y,c.z], oldMount=c.mount;
+    const zMoved=Math.abs(nz-drag.start[2])>0.25;
+    if(c.key==='rtk') c.onLidar=false;
+    if(c.mount==='top'&&!zMoved){ c.x=nx;c.y=ny;c.z=chTop(S); c._lift=60; c.z=supportZ(S,c); delete c._lift; }
+    else { c.x=nx;c.y=ny;c.z=Math.max(0,nz); if(c.mount==='top'&&zMoved) c.mount='free'; }
+    resolve(S);
+    if(UI.avoid&&collides(S,c)){ // try axis-separated
+      const tries=[[nx,old[1],c.z],[old[0],ny,c.z]]; let okk=false;
+      for(const t of tries){ c.x=t[0];c.y=t[1]; if(c.mount==='top'){c.z=chTop(S);c._lift=60;c.z=supportZ(S,c);delete c._lift} resolve(S); if(!collides(S,c)){okk=true;break} }
+      if(!okk){ c.x=old[0];c.y=old[1];c.z=old[2];c.mount=oldMount; resolve(S); }
+    }
+    drag.moved=true; RES=compute(S); rerender(); renderKPIs(); renderChecks(); return; }
+  const dx=x-drag.x, dy=y-drag.y; if(Math.abs(dx)+Math.abs(dy)>3) drag.click=false;
+  if(drag.type==='orbit'){ ORB.yaw=drag.yaw-dx*0.4; ORB.pitch=clamp(drag.pitch+dy*0.3,-5,89); draw(); }
+  else if(drag.type==='pan'){ const cam=camFor(drag.vp);
+    if(drag.vp.kind==='3d'){ const k=ORB.dist/cam.foc; ORB.t=add(drag.t,add(mul(cam.r,-dx*k),mul(cam.u,dy*k))); }
+    else { const O=ORTHO[drag.vp.kind]; O.c=add(drag.oc,add(mul(cam.r,-dx/cam.sc),mul(cam.u,dy/cam.sc))); }
+    draw(); }
+});
+cv.addEventListener('pointerleave',()=>hideTip());
+function hideTip(){$('#tip').style.display='none'}
+function showTip(id,x,y){ const T=$('#tip'); if(!id){hideTip();return}
+  let t,m='';
+  if(id==='chassis'){ t=(S.ch.type==='ladder'?'מסגרת סולם':'פלטה')+' · '+MAT[S.ch.mat].n; m=`${fmt(S.ch.L)} × ${fmt(S.ch.FW)} ס״מ · ${fmt(RES.kpi.chM,2)} ק״ג`; }
+  else { const c=S.comps.find(k=>k.id===id); if(!c){hideTip();return} t=c.name;
+    m=c.key==='wheel'?`Ø${S.ch.wheelD} × ${S.ch.tireW} · ${c.weight} ק״ג`:c.shape==='arm'?`${c.model} · ${c.weight} ק״ג`:`${r2(c.L)} × ${r2(c.W)} × ${r2(c.H)} ס״מ · ${c.weight} ק״ג`;
+    if(RES.warnIds.has(id)) m+=' · ⚠ יש אזהרה'; }
+  T.innerHTML=`${esc(t)}<div class="m">${esc(m)}</div>`; T.style.left=x+'px'; T.style.top=y+'px'; T.style.display='block'; }
+cv.addEventListener('pointerup',e=>{
+  if(drag&&drag.type==='comp'&&drag.moved){ const after=JSON.stringify(S); if(after!==drag.before){hist.past.push(drag.before);hist.future=[]} drag=null; changed(); return; }
+  if(drag&&drag.click&&!drag.clickId){ UI.sel=null; renderSide(); rerender(); }
+  drag=null;
+});
+cv.addEventListener('wheel',e=>{ e.preventDefault(); const r=cv.getBoundingClientRect(); const vp=vpAt(e.clientX-r.left,e.clientY-r.top)||viewports()[0]; zoom(e.deltaY>0?1.12:1/1.12,vp.kind); },{passive:false});
+function zoom(k,kind){ if(UI.view==='all'&&!kind){ ORB.dist=clamp(ORB.dist*k,40,1500); Object.values(ORTHO).forEach(o=>o.s=clamp(o.s/k,0.3,30)); }
+  else if((kind||UI.view)==='3d') ORB.dist=clamp(ORB.dist*k,40,1500); else { const o=ORTHO[kind||UI.view]; o.s=clamp(o.s/k,0.3,30); } draw(); }
+function fitView(){ const k=RES.kpi; const L=Math.max(k.Lt||100,60), H=Math.max(k.Ht||60,40);
+  ORB.t=[0,0,H*0.42]; ORB.dist=Math.max(L,H)*2.4;
+  const vps=viewports(); const vp=vps.find(v=>v.kind!=='3d')||{w:VW,h:VH}; const scl=Math.min(vp.w/(L*1.5),vp.h/(H*1.9))/(vp.h/600);
+  ORTHO.side={s:scl,c:[0,0,H/2]}; ORTHO.front={s:Math.min(vp.w/110,vp.h/(H*1.9))/(vp.h/600),c:[0,0,H/2]}; ORTHO.top={s:Math.min(vp.w/(L*1.5),vp.h/120)/(vp.h/600),c:[0,0,0]};
+  draw(); }
+function resize(){ const r=cv.getBoundingClientRect(); DPR=window.devicePixelRatio||1; VW=r.width; VH=r.height; cv.width=Math.max(1,VW*DPR); cv.height=Math.max(1,VH*DPR); draw(); }
+window.addEventListener('resize',resize);
+
+/* ================== panels ================== */
+function renderAll(){ buildScene(); draw(); renderSide(); renderKPIs(); renderChecks(); renderCtrl(); renderTabs(); $('#bUndo').disabled=!hist.past.length; $('#bRedo').disabled=!hist.future.length; }
+function renderSide(){ renderList(); renderSel(); }
+function renderList(){
+  const L=$('#compList'); const groups={}; S.comps.forEach(c=>{(groups[c.cat]=groups[c.cat]||[]).push(c)});
+  let h=''; let n=0;
+  CAT_ORDER.forEach(cat=>{ const g=groups[cat]; if(!g) return; h+=`<div class="grp"><b style="background:${CAT[cat].c}"></b>${CAT[cat].n}</div>`;
+    const seen={}; g.forEach(c=>{ const k=c.key+'|'+c.name; const cnt=g.filter(o=>o.key+'|'+o.name===k).length; if(seen[k]&&c.id!==UI.sel) return; seen[k]=1; const q=(c.qty||1)*(cnt>1&&c.id!==UI.sel?cnt:1); n+=q;
+      const warn=RES.warnIds.has(c.id)||(cnt>1&&g.some(o=>o.key+'|'+o.name===k&&RES.warnIds.has(o.id)));
+      h+=`<div class="crow ${UI.sel===c.id?'sel':''}" data-id="${c.id}"><span class="sw" style="background:${CAT[c.cat].c}"></span><span class="nm" title="${esc(c.model||'')}">${esc(c.name)}</span>${q>1?`<span class="qty num">${q}×</span>`:''}${c.locked?'<span class="lk" title="נעול">🔒</span>':''}${warn?'<span class="warn" title="יש אזהרה"></span>':''}<button class="ib" data-card="${c.id}" title="כרטיס רכיב">i</button></div>`; });
+  });
+  h+=`<div class="grp"><b style="background:${CAT.chassis.c}"></b>שלדה</div><div class="crow" data-id="__ch"><span class="sw" style="background:${CAT.chassis.c}"></span><span class="nm">${S.ch.type==='ladder'?'מסגרת סולם':'פלטה'} · ${MAT[S.ch.mat].n}</span><span class="qty num">${fmt(RES.kpi.chM,2)} kg</span></div>`;
+  L.innerHTML=h; $('#compCount').textContent=n+' יחידות';
+  L.querySelectorAll('.crow').forEach(r=>r.onclick=e=>{ if(e.target.dataset.card){openCard(e.target.dataset.card);return} const id=r.dataset.id; if(id==='__ch') return; UI.sel=UI.sel===id?null:id; renderSide(); rerender(); });
+}
+function renderKPIs(){
+  const k=RES.kpi, cg=RES.cg, st=RES.stab;
+  const items=[['משקל כולל',fmt(cg.m),'ק״ג'],['צריכה ממוצעת',fmt(k.P,0),'W'],['זמן עבודה',fmt(k.run),'שעות',k.run<S.rules.minRun?'bad':'good'],
+    ['מידות כוללות',`${fmt(k.Lt,0)}×${fmt(k.W,0)}×${fmt(k.Ht,0)}`,'ס״מ',k.W>S.rules.maxWidth+0.05?'bad':''],['גובה מרכז כובד',fmt(cg.z),'ס״מ'],
+    ['התהפכות צידית (גרוע)',fmt(st.minLat),'°',st.minLat<S.rules.minLat?'bad':'good'],['ניצולת שטח שלדה',fmt(k.fill,0),'%'],['אזהרות',k.warn,'',k.warn?'bad':'good']];
+  $('#kpis').innerHTML=items.map(([l,v,u,c])=>`<div class="kpi ${c||''}"><div class="l">${l}</div><div class="v num">${v}<small>${u}</small></div></div>`).join('');
+}
+function renderChecks(){
+  $('#checks').innerHTML=RES.checks.map(c=>`<div class="chk ${c.status}" data-c="${c.id}"><i></i>${c.n}${c.issues.length?`<span class="c num">${c.issues.length}</span>`:''}</div>`).join('');
+  $('#checks').querySelectorAll('.chk').forEach(e=>e.onclick=()=>openCheck(e.dataset.c));
+}
+function fld(lbl,key,val,step=0.1,extra=''){return `<div class="fld"><label>${lbl}${extra}</label><input type="number" step="${step}" data-f="${key}" value="${val}"></div>`}
+function renderSel(){
+  const P=$('#selPanel'); const c=S.comps.find(k=>k.id===UI.sel); if(!c){P.classList.remove('on');P.innerHTML='';return}
+  P.classList.add('on'); const rec=recSpot(S,c); const fixed=['wheels','armtip','arm'].includes(c.mount)||c.shape==='none';
+  let h=`<div class="top"><span class="sw" style="width:10px;height:10px;border-radius:3px;background:${CAT[c.cat].c};display:inline-block"></span><span class="title">${esc(c.name)}</span><span class="muted">${esc(c.model||'')}</span><span class="sp"></span>
+  <div class="acts edit">
+   ${fixed?'':`<button class="btn ${c.locked?'on':''}" data-a="lock">${c.locked?'🔒 נעול':'נעל מיקום'}</button>
+   <button class="btn" data-a="rotH" title="מחליף אורך ורוחב">סובב אופקית 90°</button><button class="btn" data-a="rotV" title="מחליף אורך וגובה">סובב אנכית 90°</button>
+   <button class="btn" data-a="dup">שכפל</button>`}
+   ${c.key==='wheel'||c.key==='bin'||c.key==='arm'||c.key==='battery'?'':`<button class="btn red" data-a="del">מחק</button>`}
+   <button class="btn ${UI.showDetails?'on':''}" data-a="det">פרטים</button>
+   ${c.fov?`<button class="btn ${UI.fovMode!=='none'?'on':''}" data-a="fov">שדה ראייה</button>`:''}
+   ${rec&&!fixed?`<button class="btn" data-a="rec" title="${esc(rec.why)}">למקום המומלץ</button>`:''}
+   ${RES.warnIds.has(c.id)&&movable(c)?`<button class="btn pri" data-a="smart" title="בוחר מיקום לפי כל הבדיקות וההמלצה ההנדסית">⚠ תקן מיקום</button>`:''}
+  </div><button class="btn" data-a="card">כרטיס</button><button class="btn" data-a="close">✕</button></div>`;
+  if(rec&&!fixed&&UI.mode==='design') h+=`<div class="muted" style="font-size:11.5px;margin-top:5px">המקום המומלץ: ${esc(rec.why)}</div>`;
+  if(UI.showDetails||UI.mode==='present'){ const dis=UI.mode==='present'?' disabled':'';
+    h+='<div class="fields">';
+    if(c.key==='wheel'){ h+=fld('קוטר (ס״מ)','ch.wheelD',S.ch.wheelD)+fld('רוחב צמיג','ch.tireW',S.ch.tireW); }
+    else if(!fixed||c.key==='ee'){ h+=fld('אורך X (ס״מ)','L',c.L)+fld('רוחב Y','W',c.W)+fld('גובה Z','H',c.H); }
+    if(!fixed) h+=fld('מיקום X (קדימה +)','x',c.x)+fld('מיקום Y (שמאל +)','y',c.y)+fld('גובה תחתית Z','z',c.z);
+    h+=fld('משקל (ק״ג)'+(c.key==='wheel'?' לגלגל':''),'weight',c.weight,0.01,c.wEst?'<span class="est">הנחה</span>':'')+fld('צריכה ממוצעת (W)'+(c.key==='wheel'?' לגלגל':''),'power',c.power,0.1,c.pEst?'<span class="est">הנחה</span>':'');
+    if(c.fov&&c.fov.type==='cam') h+=fld('כיוון (°, 0=קדימה)','fov.yaw',c.fov.yaw,1)+fld('הטיה (° שלילי=למטה)','fov.pitch',c.fov.pitch,1)+fld('זווית אופקית','fov.h',c.fov.h,1)+fld('זווית אנכית','fov.v',c.fov.v,0.5)+fld('טווח בדיקה','fov.range',c.fov.range,1);
+    if(c.fov&&c.fov.type==='lidar') h+=fld('זווית תחתונה','fov.vmin',c.fov.vmin,1)+fld('זווית עליונה','fov.vmax',c.fov.vmax,1)+fld('טווח בדיקה','fov.range',c.fov.range,1);
+    if(c.mount==='front'||c.mount==='rear'||c.mount==='top'||c.mount==='free') h+=`<div class="fld"><label>עיגון</label><select data-f="mount"${dis}>${[['top','יושב על משטח'],['free','חופשי (גובה קבוע)'],['front','דופן קדמית'],['rear','דופן אחורית']].map(([v,t])=>`<option value="${v}" ${c.mount===v?'selected':''}>${t}</option>`).join('')}</select></div>`;
+    h+='</div>';
+    if(dis) h=h.replace(/<input /g,'<input disabled ');
+  }
+  P.innerHTML=h;
+  P.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>selAction(b.dataset.a,c.id));
+  P.querySelectorAll('[data-f]').forEach(inp=>inp.onchange=()=>{ const f=inp.dataset.f, v=inp.tagName==='SELECT'?inp.value:parseFloat(inp.value); if(inp.tagName!=='SELECT'&&!isFinite(v)) return;
+    commit(s=>{ const k=s.comps.find(q=>q.id===c.id); if(f.startsWith('ch.')) setChassis(s,f.slice(3),v); else if(f.startsWith('fov.')) k.fov[f.slice(4)]=v; else { k[f]=v; if(f==='weight')k.wEst=false; if(f==='power')k.pEst=false; if(k.key==='bin'&&['L','W','H'].includes(f)){} } }); });
+}
+function selAction(a,id){
+  const c=S.comps.find(k=>k.id===id); if(!c) return;
+  if(a==='close'){UI.sel=null;renderSide();rerender();return}
+  if(a==='card'){openCard(id);return}
+  if(a==='det'){UI.showDetails=!UI.showDetails;renderSel();return}
+  if(a==='fov'){UI.fovMode=UI.fovMode==='none'?'sel':'none';renderCtrl();renderSel();rerender();return}
+  if(a==='smart'){runFix({smart:id,l:'מקם מחדש את '+c.name,f:st=>smartPlace(st,id)});return}
+  commit(s=>{ const k=s.comps.find(q=>q.id===id);
+    if(a==='lock') k.locked=!k.locked;
+    if(a==='rotH'){[k.L,k.W]=[k.W,k.L]; if(k.fov&&k.fov.type==='cam'){} }
+    if(a==='rotV'){[k.L,k.H]=[k.H,k.L]; if(k.mount==='top'){k.z=supportZ(s,k)} }
+    if(a==='dup'){ const n=clone(k); n.id=uid(); n.locked=false; const p=freeSpot(s,n,k.x,k.y,true); if(p){n.x=p.x;n.y=p.y;n.z=p.z}else{n.y+=k.W+1} s.comps.push(n); UI.sel=n.id; }
+    if(a==='del'){ s.comps=s.comps.filter(q=>q.id!==id); UI.sel=null; }
+    if(a==='rec'){ if(!moveToRec(s,k)) toast('לא נמצא מקום פנוי ליד המקום המומלץ'); }
+  });
+}
+function slider(lbl,key,val,min,max,step,unit){return `<div class="sl"><label><span>${lbl}</span><span class="muted">${unit||''}</span></label><input type="range" min="${min}" max="${max}" step="${step}" value="${val}" data-k="${key}"><input type="number" min="${min}" max="${max}" step="${step}" value="${r2(val)}" data-k="${key}"></div>`}
+function renderCtrl(){
+  const c=S.ch, k=RES.kpi, dis=UI.mode==='present';
+  let h=`<div class="ph"><h3>שלדה ופרמטרים</h3></div>
+  <div class="sec edit"><h4>סוג שלדה</h4>
+    <div class="seg" style="width:100%"><button data-ct="ladder" class="${c.type==='ladder'?'on':''}" style="flex:1">מסגרת סולם</button><button data-ct="plate" class="${c.type==='plate'?'on':''}" style="flex:1">פלטה שטוחה</button></div>
+    <div class="row" style="margin-top:8px"><span class="muted" style="font-size:11.5px">חומר</span><select class="s" data-mat>${Object.entries(MAT).map(([k2,v])=>`<option value="${k2}" ${c.mat===k2?'selected':''}>${v.n}</option>`).join('')}</select></div>
+  </div>
+  <div class="sec edit"><h4>מידות שלדה <span class="muted">ס״מ</span></h4>
+    ${slider('אורך שלדה','L',c.L,30,160,0.5)}
+    ${slider('רוחב כולל של הכלי (כולל גלגלים)','TW',totalWidthWheels(S),24,60,0.5)}
+    <div class="ro" style="margin:-2px 0 8px"><span>רוחב השלדה (נגזר)</span><b class="num">${fmt(c.FW)}</b></div>
+    ${c.type==='ladder'?slider('רוחב פרופיל','profW',c.profW,1,8,0.1)+slider('גובה פרופיל','profH',c.profH,1,10,0.1)+slider('עובי דופן פרופיל','wall',c.wall,0.1,0.6,0.05)+slider('מספר קורות רוחב','cross',c.cross,2,8,1,''):slider('עובי פלטה','plateT',c.plateT,0.2,2,0.05)}
+    ${slider('מרווח גחון (תחתית השלדה)','clear',c.clear,3,40,0.5)}
+  </div>
+  <div class="sec edit"><h4>גלגלים</h4>
+    <div class="row" style="margin-bottom:8px"><span class="muted" style="font-size:11.5px">מתלה</span><div class="seg"><button data-su="rigid" class="${c.susp!=='rocker'?'on':''}">קשיח</button><button data-su="rocker" class="${c.susp==='rocker'?'on':''}">ארטיקולציה (Warthog)</button></div></div>
+    ${c.susp==='rocker'?slider('מיקום ציר הארטיקולציה (מהאמצע)','pivX',c.pivX||0,-25,25,0.5)+slider('מהלך מקסימלי ±','maxArt',c.maxArt||12,3,25,1,'°')+slider('עובי יחידת הנעה','beamW',c.beamW||2,1,5,0.5)+`<div class="sl"><label><span>הדגמת תנועה</span><span class="muted">°</span></label><input type="range" min="${-(c.maxArt||12)}" max="${c.maxArt||12}" step="0.5" value="${UI.art||0}" data-art><button class="btn" id="artPlay" style="padding:3px 6px">${UI.artAnim?'■':'▶'}</button></div>`:''}
+    ${slider('מרחק בין צירים (קדמי–אחורי)','WB',c.WB,c.wheelD+2,Math.max(c.wheelD+3,c.L+20),0.5)}
+    ${slider('הסטת צירים קדימה/אחורה','axOff',c.axOff,-30,30,0.5)}
+    ${slider('מרווח שלדה–צמיג','gap',c.gap,0,10,0.5)}
+    ${slider('קוטר גלגל','wheelD',c.wheelD,15,40,0.1)}
+    ${slider('רוחב צמיג','tireW',c.tireW,3,15,0.1)}
+    <div class="ro"><span>מרחק בין גלגלים (מרכז–מרכז)</span><b class="num">${fmt(trackW(S))}</b><span>מרחק פנימי בין הגלגלים</span><b class="num">${fmt(c.FW+2*c.gap)}</b><span>רוחב כולל עם גלגלים</span><b class="num">${fmt(totalWidthWheels(S))}</b></div>
+  </div>
+  <div class="sec"><h4>מדידות</h4><div class="ro" style="margin-top:0">
+    <span>מרווח גחון (נקודה נמוכה)</span><b class="num">${fmt(k.belly)}</b><span>גובה עליון של השלדה</span><b class="num">${fmt(chTop(S))}</b><span>גובה כולל</span><b class="num">${fmt(k.Ht)}</b>
+    <span>אורך כולל</span><b class="num">${fmt(k.Lt)}</b><span>משקל שלדה</span><b class="num">${fmt(k.chM,2)} ק״ג</b><span>לחץ על הקרקע (גלגל עמוס)</span><b class="num">${fmt(k.press)} kPa</b>
+    <span>מרכז כובד X / Y / Z</span><b class="num">${fmt(RES.cg.x)} / ${fmt(RES.cg.y)} / ${fmt(RES.cg.z)}</b></div></div>
+  <div class="sec edit"><h4>סידור</h4><div class="row"><button class="btn" data-l="opt" title="מיקום כל רכיב לפי המקום המומלץ שלו, בלי חפיפות">סידור אופטימלי</button><button class="btn" data-l="re" title="סידור תקין אחר בכל לחיצה">סידור מחדש</button></div>
+    <div class="row" style="margin-top:6px"><button class="btn" data-l="min" title="מקצר ומצר את השלדה עד הרכיבים שיושבים עליה">מזער שלדה</button><button class="btn" data-l="fit" title="מגדיל את השלדה כך שכל הרכיבים יישענו עליה">הכל על השלדה</button></div>
+    <label class="tg"><input type="checkbox" data-u="avoid" ${UI.avoid?'checked':''}>מנע חפיפות בזמן גרירה</label></div>
+  <div class="sec"><h4>זרוע</h4>
+    <div class="row edit" style="margin-bottom:8px">${[['fold','מקופלת'],['L-low','שמאל נמוך'],['L-high','שמאל גבוה'],['R-low','ימין נמוך'],['R-high','ימין גבוה'],['drop','לארגז']].map(([k2,t])=>`<button class="btn" data-pose="${k2}" style="flex:0 0 auto;padding:4px 8px">${t}</button>`).join('')}</div>
+    ${slider('סיבוב בסיס','arm.yaw',S.arm.yaw,-180,180,1,'°')}${slider('כתף (מהאנך)','arm.sh',S.arm.sh,-150,150,1,'°')}${slider('מרפק','arm.el',S.arm.el,-165,165,1,'°')}${slider('שורש כף יד','arm.wr',S.arm.wr,-150,150,1,'°')}
+  </div>
+  <div class="sec"><h4>ארגז ופריקה</h4>
+    ${slider('פלפלים בארגז','bin.fill',S.bin.fill,0,10,0.5,'ק״ג')}
+    ${slider('הטיית הארגז','bin.tilt',S.bin.tilt,0,60,1,'°')}
+    <div class="row edit" style="margin-bottom:8px"><span class="muted" style="font-size:11.5px">כיוון פריקה</span><div class="seg"><button data-dd="front" class="${S.bin.dir==='front'?'on':''}">קדימה</button><button data-dd="rear" class="${S.bin.dir==='rear'?'on':''}">אחורה</button></div></div>
+    <div class="edit">${slider('מרחק בוכנה מהציר','bin.actD',S.bin.actD,1,30,0.5,'ס״מ')}${slider('אורך בוכנה סגורה (הנחה)','bin.actClosed',S.bin.actClosed,8,40,0.5,'ס״מ')}${slider('שיפוע דופן הפריקה','bin.slope',S.bin.slope,0,40,1,'°')}${slider('זווית הבוכנה','bin.actAng',S.bin.actAng,0,45,1,'°')}<label class="row" style="gap:6px;font-size:11.5px;margin:4px 0 6px"><input type="checkbox" data-fp ${S.bin.floorPerp?'checked':''}> רצפת הארגז ניצבת לבוכנה (עולה לכיוון הסוללה)</label>${S.bin.floorPerp?'':slider('שיפוע רצפת הארגז','bin.floorAng',S.bin.floorAng,0,40,1,'°')}</div>
+    <div class="ro"><span>נפח הארגז (חוץ)</span><b class="num">${fmt(binVol(S))} ל׳</b></div>
+    <div class="ro"><span>מהלך נדרש ל־${S.rules.dumpAng}°</span><b class="num">${fmt(RES.dump?.need)} / ${S.bin.actStroke}</b><span>יחס כוח (ארגז מלא)</span><b class="num">${fmt(RES.dump?.minM,2)}×</b></div>
+  </div>
+  <div class="sec"><h4>תצוגה ושכבות</h4>
+    <div class="row" style="margin-bottom:6px"><span class="muted" style="font-size:11.5px;min-width:72px">שדות ראייה</span><div class="seg">${[['none','כבוי'],['sel','נבחר'],['all','הכל']].map(([v,t])=>`<button data-fv="${v}" class="${UI.fovMode===v?'on':''}">${t}</button>`).join('')}</div></div>
+    <div class="row" style="margin-bottom:6px"><span class="muted" style="font-size:11.5px;min-width:72px">כבלים</span><div class="seg">${[['none','כבוי'],['data','נתונים'],['power','חשמל'],['both','שניהם']].map(([v,t])=>`<button data-cb="${v}" class="${UI.cables===v?'on':''}">${t}</button>`).join('')}</div></div>
+    <div class="row" style="margin-bottom:6px"><span class="muted" style="font-size:11.5px;min-width:72px">רכיבים</span><div class="seg">${[['solid','מלא'],['ghost','שקוף'],['skel','שלד בלבד']].map(([v,t])=>`<button data-rd="${v}" class="${UI.render===v?'on':''}">${t}</button>`).join('')}</div></div>
+    ${[['dims','קווי מידה'],['arrows','חץ כיוון נסיעה'],['bushes','שורות שיחים ונקודות קטיף'],['reach','טווח הזרוע'],['labels','שמות רכיבים']].map(([k2,t])=>`<label class="tg"><input type="checkbox" data-u="${k2}" ${UI[k2]?'checked':''}>${t}</label>`).join('')}
+  </div>
+  <div class="sec muted" style="font-size:11px;line-height:1.6">מערכת צירים: X קדימה (+) · Y שמאל (+) · Z למעלה. 0 = מרכז השלדה על הקרקע. כל המידות בס״מ. ערכים מסומנים <span class="est">הנחה</span> לא פורסמו ע״י היצרן.</div>`;
+  const P=$('#ctrlPanel'); const st=P.scrollTop; P.innerHTML=h; P.scrollTop=st;
+  if(dis) P.querySelectorAll('input,select').forEach(i=>{ if(!i.dataset.u&&!i.dataset.k?.startsWith('x')) i.disabled=true });
+  P.querySelectorAll('input[data-k]').forEach(inp=>{
+    const apply=(final)=>{ const v=parseFloat(inp.value); if(!isFinite(v)) return; const key=inp.dataset.k;
+      P.querySelectorAll(`input[data-k="${key}"]`).forEach(o=>{if(o!==inp)o.value=v});
+      const mut=s=>{ if(key.startsWith('arm.')) s.arm[key.slice(4)]=v; else if(key.startsWith('bin.')) s.bin[key.slice(4)]=v; else setChassis(s,key,key==='cross'?Math.round(v):v); };
+      if(final) { if(LIVE){S=JSON.parse(LIVE);LIVE=null} commit(mut); }
+      else { if(!LIVE) LIVE=JSON.stringify(S); mut(S); resolve(S); RES=compute(S); rerender(); renderKPIs(); renderChecks(); }
+    };
+    inp.addEventListener('input',()=>{ if(inp.type==='range') apply(false) });
+    inp.addEventListener('change',()=>apply(true));
+  });
+  P.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>commit(s=>setChassis(s,'type',b.dataset.ct)));
+  P.querySelectorAll('[data-su]').forEach(b=>b.onclick=()=>{ if(b.dataset.su!=='rocker'){UI.art=0;UI.artAnim=false} commit(s=>setChassis(s,'susp',b.dataset.su)); });
+  const ar=P.querySelector('[data-art]'); if(ar) ar.oninput=()=>{UI.artAnim=false;UI.art=parseFloat(ar.value);rerender()};
+  const ap=P.querySelector('#artPlay'); if(ap) ap.onclick=()=>{ UI.artAnim=!UI.artAnim; ap.textContent=UI.artAnim?'■':'▶'; if(UI.artAnim){ const t0=performance.now(); const step=()=>{ if(!UI.artAnim||!rockerOn(S)) return; UI.art=r1((S.ch.maxArt||12)*Math.sin((performance.now()-t0)/700)); const a2=document.querySelector('[data-art]'); if(a2) a2.value=UI.art; rerender(); requestAnimationFrame(step); }; requestAnimationFrame(step);} else {UI.art=0;rerender()} };
+  P.querySelector('[data-mat]')&&(P.querySelector('[data-mat]').onchange=e=>commit(s=>{s.ch.mat=e.target.value}));
+  P.querySelectorAll('[data-dd]').forEach(b=>b.onclick=()=>commit(s=>{s.bin.dir=b.dataset.dd}));
+  P.querySelectorAll('[data-fp]').forEach(b=>b.onchange=()=>commit(s=>{s.bin.floorPerp=b.checked; if(!b.checked) s.bin.floorAng=s.bin.actAng;}));
+  P.querySelectorAll('[data-fv]').forEach(b=>b.onclick=()=>{UI.fovMode=b.dataset.fv;renderCtrl();rerender()});
+  P.querySelectorAll('[data-cb]').forEach(b=>b.onclick=()=>{UI.cables=b.dataset.cb;renderCtrl();rerender()});
+  P.querySelectorAll('[data-rd]').forEach(b=>b.onclick=()=>{UI.render=b.dataset.rd;renderCtrl();rerender()});
+  P.querySelectorAll('[data-u]').forEach(b=>b.onchange=()=>{UI[b.dataset.u]=b.checked;rerender()});
+  P.querySelectorAll('[data-pose]').forEach(b=>b.onclick=()=>{ const k2=b.dataset.pose; let pose;
+    if(k2==='fold') pose=restPose(S); else if(k2==='drop') pose=ik(S,dropTarget(S),PSI_DROP); else { const t=armTargets(S).find(t=>t.k===k2); pose=ik(S,t.p,PSI_PICK); }
+    if(!pose){toast('הזרוע לא מגיעה לנקודה הזו');return} commit(s=>{s.arm=pose}); });
+  P.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{ const l=b.dataset.l;
+    if(l==='opt') preview(s=>autoLayout(s,false),'סידור אופטימלי: כל רכיב במקום המומלץ שלו');
+    if(l==='re') preview(s=>{ const cur=JSON.stringify(s.comps.map(c=>[r1(c.x),r1(c.y)])); let best=null,bw=1e9; for(let i=0;i<12;i++){ const t=clone(s); autoLayout(t,true); const sig=JSON.stringify(t.comps.map(c=>[r1(c.x),r1(c.y)])); if(sig===cur) continue; const w=compute(t).kpi.warn+Math.random()*0.5; if(w<bw){bw=w;best=t} } if(best) Object.assign(s,best); },'סידור מחדש: סידור תקין אחר');
+    if(l==='min') preview(s=>fitChassis(s,true),'מזעור: השלדה קוצרה עד הרכיבים');
+    if(l==='fit') preview(s=>fitChassis(s,false),'השלדה הוגדלה כך שכל הרכיבים נשענים עליה'); });
+}
+let LIVE=null;
+function renderTabs(){
+  const ids=Object.keys(CFG.list).sort((a,b)=>CFG.list[a].order-CFG.list[b].order);
+  let h=''; if(CFG.draft) h+=`<div class="tab on"><span>טיוטה (עוד לא נשמרה)</span></div>`;
+  ids.forEach(id=>{ const c=CFG.list[id]; let w=0; if(id!==CFG.active){ try{w=compute(hydrate(JSON.parse(c.json))).kpi.warn}catch(e){} } else w=RES.kpi.warn;
+    h+=`<div class="tab ${id===CFG.active?'on':''}" data-id="${id}"><span>${esc(c.name)}</span>${w?`<span class="w num">${w}⚠</span>`:''}<span class="ta edit"><button data-t="dup" title="שכפל">⧉</button><button data-t="ren" title="שנה שם">✎</button><button data-t="del" title="מחק">🗑</button></span></div>`; });
+  h+=`<button class="btn edit" id="tabAdd" title="קונפיגורציה חדשה">+ חדשה</button>`;
+  const T=$('#tabs'); T.innerHTML=h;
+  T.querySelectorAll('.tab[data-id]').forEach(t=>t.onclick=e=>{ const id=t.dataset.id, a=e.target.dataset.t;
+    if(a==='dup'){ const c=CFG.list[id]; const n={id:uid(),name:c.name+' (עותק)',order:Date.now(),json:c.json,updatedAt:Date.now()}; Store.put(n); loadCfg(n.id); return; }
+    if(a==='ren'){ askText('שם הקונפיגורציה',CFG.list[id].name,v=>{const c={...CFG.list[id],name:v,updatedAt:Date.now()};Store.put(c);renderTabs()}); return; }
+    if(a==='del'){ confirmBox(`למחוק את "${CFG.list[id].name}"? אי אפשר לשחזר.`,()=>{ Store.del(id); if(id===CFG.active){const rest=Object.keys(CFG.list);if(rest.length)loadCfg(rest[0]);else{CFG.active=uid();CFG.draft=true;renderTabs()}} else renderTabs(); }); return; }
+    if(id!==CFG.active){ saveNowIfDirty(); loadCfg(id); } });
+  const ad=$('#tabAdd'); if(ad) ad.onclick=()=>{ askText('שם לקונפיגורציה החדשה','קונפיגורציה '+(ids.length+1),v=>{ const base=makeDefault(); resolve(base); const n={id:uid(),name:v,order:Date.now(),json:JSON.stringify(base),updatedAt:Date.now()}; Store.put(n); loadCfg(n.id); },'מתחילה מהסידור של התמונות. לשכפול של הנוכחית השתמשי ב־⧉ על הלשונית.'); };
+}
+function saveNowIfDirty(){ if(saveT){clearTimeout(saveT);saveT=null;saveNow()} }
+
+/* ================== dialogs ================== */
+function modal(title,body,wide){ const M=$('#modal'),B=$('#mbox'); B.style.width=wide?'min(1000px,96vw)':''; B.innerHTML=`<div class="mh"><h3>${title}</h3><button class="btn" id="mClose">סגור</button></div><div class="mb">${body}</div>`; M.classList.add('on'); $('#mClose').onclick=closeModal; return B; }
+function closeModal(){ $('#modal').classList.remove('on') }
+$('#modal').addEventListener('pointerdown',e=>{ if(e.target.id==='modal') closeModal() });
+function askText(title,val,cb,note){ const B=modal(title,`${note?`<p class="muted" style="margin-top:0">${note}</p>`:''}<input id="askIn" style="width:100%;background:#0f1215;border:1px solid var(--line);border-radius:8px;padding:8px" value="${esc(val)}"><div class="row" style="margin-top:12px;justify-content:flex-start"><button class="btn pri" id="askOk" style="flex:0">אישור</button></div>`);
+  const i=$('#askIn'); i.focus(); i.select(); const ok=()=>{const v=i.value.trim(); if(v){closeModal();cb(v)}}; $('#askOk').onclick=ok; i.onkeydown=e=>{if(e.key==='Enter')ok()}; }
+function confirmBox(t,cb){ modal('אישור',`<p>${t}</p><div class="row" style="justify-content:flex-start"><button class="btn red" id="cfOk" style="flex:0">כן</button><button class="btn" id="cfNo" style="flex:0">לא</button></div>`); $('#cfOk').onclick=()=>{closeModal();cb()}; $('#cfNo').onclick=closeModal; }
+function openCard(id){
+  const c=S.comps.find(k=>k.id===id); if(!c) return; const rec=recSpot(S,c);
+  let dims=c.key==='wheel'?`Ø${S.ch.wheelD} × ${S.ch.tireW}`:(c.shape==='none'?`${c.L} × ${c.W} × ${c.H}`:`${r2(c.L)} × ${r2(c.W)} × ${r2(c.H)}`);
+  const iss=RES.checks.flatMap(ch=>ch.issues.filter(i=>i.ids.includes(id)).map(i=>`<li><span class="${ch.status==='acc'?'accc':'badc'}">${ch.n}:</span> ${esc(i.t)}</li>`)).join('');
+  modal(esc(c.name),`<table>
+   <tr><th>דגם</th><td>${esc(c.model||'—')}</td></tr>
+   <tr><th>קטגוריה</th><td>${CAT[c.cat].n}</td></tr>
+   <tr><th>מידות (ס״מ, X×Y×Z)</th><td class="num">${dims}</td></tr>
+   <tr><th>כמות</th><td class="num">${c.qty||1}${S.comps.filter(o=>o.key===c.key&&o.name===c.name).length>1?' × '+S.comps.filter(o=>o.key===c.key&&o.name===c.name).length:''}</td></tr>
+   <tr><th>משקל</th><td><span class="num">${c.weight} ק״ג</span>${c.wEst?' <span class="est">הנחה</span>':''}</td></tr>
+   <tr><th>צריכה ממוצעת</th><td><span class="num">${c.power} W</span>${c.pEst?' <span class="est">הנחה</span>':''}</td></tr>
+   ${c.ip?`<tr><th>אטימות</th><td>${c.ip}</td></tr>`:''}
+   ${c.shape!=='none'&&c.mount!=='wheels'?`<tr><th>מיקום (מרכז X,Y · תחתית Z)</th><td class="num">${fmt(c.x)}, ${fmt(c.y)}, ${fmt(c.z)}</td></tr>`:''}
+   <tr><th>הערות</th><td>${esc(c.note||'—')}</td></tr>
+   ${rec?`<tr><th>המקום המומלץ</th><td>${esc(rec.why)}</td></tr>`:''}
+   ${c.link?`<tr><th>מקור</th><td><a href="${esc(c.link)}" target="_blank" rel="noopener">דף נתונים</a></td></tr>`:''}
+  </table>${iss?`<h4 style="margin:14px 0 6px">אזהרות על הרכיב</h4><ul style="margin:0;padding-inline-start:18px">${iss}</ul>${movable(c)&&UI.mode==='design'?`<div class="row" style="margin-top:10px;justify-content:flex-start"><button class="btn pri" id="cardFix" style="flex:0">⚠ תקן מיקום</button></div>`:''}`:''}`);
+  const cf=$('#cardFix'); if(cf) cf.onclick=()=>{closeModal();runFix({smart:id,l:'מקם מחדש את '+c.name,f:st=>smartPlace(st,id)})};
+}
+function openCheck(cid){
+  const ch=RES.checks.find(c=>c.id===cid); if(!ch) return; const acc=S.accepted[cid];
+  let h=`<div><span class="pill ${ch.status==='ok'?'okc':ch.status==='acc'?'accc':'badc'}">${ch.status==='ok'?'תקין':ch.status==='acc'?'התקבל כמו שזה':'בעיה'}</span> <span class="muted">${ch.issues.length} ממצאים</span></div>
+  <div class="why"><b>למה זה חשוב:</b> ${ch.why}<br><span class="muted">מקור: ${ch.src}</span></div>`;
+  if(ch.detail&&ch.detail.length) h+=`<div style="margin-bottom:10px">${ch.detail.map(d=>`<div class="muted" style="font-size:12px;margin:2px 0">• ${esc(d)}</div>`).join('')}</div>`;
+  ch.issues.forEach((i,n)=>{ h+=`<div class="issue"><div>${esc(i.t)}</div><div class="row edit">${i.ids.filter(id=>S.comps.some(c=>c.id===id)).map(id=>`<button class="btn" style="flex:0" data-sel="${id}">הצג ${esc(S.comps.find(c=>c.id===id).name)}</button>`).join('')}${(i.fixes||[]).map((f,k)=>`<button class="btn ${k===0?'pri':''}" style="flex:0" data-fix="${n}:${k}" title="${f.smart?'הלוח בודק מקומות אפשריים לרכיב ובוחר את המקום עם הכי מעט בעיות, קרוב למקום המומלץ הנדסית':''}">תקן: ${esc(f.l)}</button>`).join('')}</div></div>`; });
+  if(ch.issues.length) h+=`<div class="edit" style="margin-top:12px"><h4 style="margin:0 0 6px">קבלה כמו שזה</h4><textarea id="accNote" placeholder="הסבר קצר: למה זה בסדר (למשל: מסכה בתוכנה לזרוע)">${esc(acc||'')}</textarea>
+    <div class="row" style="margin-top:8px;justify-content:flex-start">${acc!=null?`<button class="btn" id="accDel" style="flex:0">בטל קבלה</button>`:''}<button class="btn" id="accOk" style="flex:0">${acc!=null?'עדכן הערה':'קבל כמו שזה'}</button></div></div>`;
+  else if(acc!=null) h+=`<p class="muted">הערה שנשמרה: ${esc(acc)}</p>`;
+  const B=modal(ch.n,h);
+  B.querySelectorAll('[data-sel]').forEach(b=>b.onclick=()=>{UI.sel=b.dataset.sel;closeModal();renderSide();rerender()});
+  B.querySelectorAll('[data-fix]').forEach(b=>b.onclick=()=>{ const [n,k]=b.dataset.fix.split(':').map(Number); const f=ch.issues[n].fixes[k]; closeModal(); runFix(f); });
+  const ok=$('#accOk'); if(ok) ok.onclick=()=>{ const v=$('#accNote').value.trim()||'התקבל'; closeModal(); commit(s=>{s.accepted[cid]=v}); };
+  const dl=$('#accDel'); if(dl) dl.onclick=()=>{ closeModal(); commit(s=>{delete s.accepted[cid]}); };
+}
+let PV=null;
+function preview(mut,text){
+  if(UI.mode==='present') return; if(PV) PV.cancel();
+  const before=JSON.stringify(S); const w0=RES.kpi.warn; const s2=JSON.parse(before); const res=mut(s2); resolve(s2);
+  if(res&&res.moved===false){ toast(res.text); return; }
+  S=s2; RES=compute(S); renderAll();
+  $('#pvText').textContent=`${res&&res.text?res.text:text} · אזהרות: ${w0} ← ${RES.kpi.warn}`; $('#preview').classList.add('on');
+  PV={cancel(){ S=JSON.parse(before); RES=compute(S); $('#preview').classList.remove('on'); PV=null; renderAll(); },
+      ok(){ $('#preview').classList.remove('on'); PV=null; hist.past.push(before); hist.future=[]; changed(); }};
+}
+function runFix(f){ if(f.smart){ UI.sel=f.smart; toast('מחפש מקום הנדסי…'); setTimeout(()=>preview(st=>f.f(st),'תיקון: '+f.l),30); } else preview(st=>f.f(st),'תיקון: '+f.l); }
+$('#pvOk').onclick=()=>PV&&PV.ok(); $('#pvNo').onclick=()=>PV&&PV.cancel();
+function openRules(){
+  const R=S.rules; const ro=UI.mode==='present'?' disabled':'';
+  const B=modal('חוקי הנדסה',`<p class="muted" style="margin-top:0">הבדיקות משתמשות בערכים האלה. הם מציגים אזהרות ותיקונים מוצעים ולעולם לא חוסמים שינוי. השינוי נשמר בקונפיגורציה הנוכחית.</p>
+  <table><tr><th>חוק</th><th>ערך</th><th>הסבר</th><th>מקור</th></tr>${RULES.map(r=>`<tr><td>${r[1]}</td><td><input type="number" step="any" data-r="${r[0]}" value="${R[r[0]]}"${ro}> <span class="muted">${r[3]}</span></td><td>${r[4]}</td><td class="muted">${r[5]||'—'}</td></tr>`).join('')}</table>
+  <div class="row edit" style="margin-top:10px;justify-content:flex-start"><button class="btn" id="rReset" style="flex:0">החזר לברירת מחדל</button></div>`,true);
+  B.querySelectorAll('[data-r]').forEach(i=>i.onchange=()=>{const v=parseFloat(i.value); if(isFinite(v)) commit(s=>{s.rules[i.dataset.r]=v})});
+  const rr=$('#rReset'); if(rr) rr.onclick=()=>{commit(s=>{s.rules=defaultRules()});openRules()};
+}
+function openCompare(){
+  const ids=Object.keys(CFG.list).sort((a,b)=>CFG.list[a].order-CFG.list[b].order); if(CFG.draft||!ids.length) {}
+  const cols=ids.map(id=>{let s;try{s=hydrate(JSON.parse(CFG.list[id].json))}catch(e){return null} if(id===CFG.active) s=S; s.rules=Object.assign(defaultRules(),s.rules||{}); const r=compute(s); return {n:CFG.list[id].name,s,r,act:id===CFG.active}}).filter(Boolean);
+  if(CFG.draft) cols.unshift({n:'טיוטה',s:S,r:RES,act:true});
+  const rows=[['סוג שלדה',x=>x.s.ch.type==='ladder'?'סולם':'פלטה'],['אורך שלדה',x=>fmt(x.s.ch.L)],['רוחב שלדה',x=>fmt(x.s.ch.FW)],['בין צירים',x=>fmt(x.s.ch.WB)],['בין גלגלים (מרכז)',x=>fmt(trackW(x.s))],
+    ['מידות כוללות',x=>`${fmt(x.r.kpi.Lt,0)}×${fmt(x.r.kpi.W,0)}×${fmt(x.r.kpi.Ht,0)}`],['מרווח גחון',x=>fmt(x.r.kpi.belly)],['משקל כולל',x=>fmt(x.r.cg.m)+' ק״ג'],['משקל שלדה',x=>fmt(x.r.kpi.chM,2)+' ק״ג'],
+    ['גובה מרכז כובד',x=>fmt(x.r.cg.z)],['התהפכות צידית (גרוע)',x=>fmt(x.r.stab.minLat)+'°'],['התהפכות אורכית (גרוע)',x=>fmt(x.r.stab.minLon)+'°'],['צריכה',x=>fmt(x.r.kpi.P,0)+' W'],['זמן עבודה',x=>fmt(x.r.kpi.run)+' ש׳'],
+    ['LiDAR מוסתר',x=>fmt(x.r.lidar?.pct,1)+'%'],['ניצולת שטח',x=>fmt(x.r.kpi.fill,0)+'%'],['אזהרות',x=>x.r.kpi.warn]];
+  modal('השוואת קונפיגורציות',`<div style="overflow:auto"><table><tr><th></th>${cols.map(c=>`<th style="color:${c.act?'var(--amber)':''}">${esc(c.n)}</th>`).join('')}</tr>
+   ${rows.map(([l,f])=>`<tr><th>${l}</th>${cols.map(c=>`<td class="num">${f(c)}</td>`).join('')}</tr>`).join('')}
+   <tr><th>בדיקות</th>${cols.map(c=>`<td>${c.r.checks.map(k=>`<span title="${k.n}" style="display:inline-block;width:9px;height:9px;border-radius:50%;margin:1px;background:${k.status==='ok'?'var(--ok)':k.status==='acc'?'var(--amber)':'var(--bad)'}"></span>`).join('')}</td>`).join('')}</tr></table></div>`,true);
+}
+
+/* ================== top bar ================== */
+$('#views').querySelectorAll('button').forEach(b=>b.onclick=()=>{ UI.view=b.dataset.v; $('#views').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); fitView(); });
+$('#modes').querySelectorAll('button').forEach(b=>b.onclick=()=>{ UI.mode=b.dataset.m; document.body.classList.toggle('present',UI.mode==='present'); $('#modes').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); $('#hint').style.display=UI.mode==='present'?'none':''; renderAll(); });
+$('#bUndo').onclick=undo; $('#bRedo').onclick=redo; $('#bRules').onclick=openRules; $('#bCompare').onclick=openCompare;
+$('#zIn').onclick=()=>zoom(1/1.2); $('#zOut').onclick=()=>zoom(1.2); $('#zFit').onclick=fitView;
+$('#bSave').onclick=async()=>{ const name=(CFG.list[CFG.active]?.name||'kli-config').replace(/[^\w֐-׿ -]+/g,'_'); const data=JSON.stringify({app:'kli-chassis',name:CFG.list[CFG.active]?.name||'טיוטה',config:S},null,1);
+  let dl=null; try{ if(window.claude&&window.claude.use) dl=await Promise.race([window.claude.use('downloads'),new Promise(r=>setTimeout(()=>r(null),3000))]) }catch(e){}
+  if(dl){ try{ await dl.save({filename:name+'.json',data}); toast('הקובץ נשמר'); return; }catch(e){ if(e&&/declin|cancel|reject/i.test(e.code||e.message||'')){toast('השמירה בוטלה');return} } }
+  try{ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:'application/json'})); a.download=name+'.json'; a.click(); }catch(e){}
+  const B=modal('שמירה לקובץ',`<p class="muted" style="margin-top:0">אם ההורדה לא התחילה, העתיקי את הטקסט לקובץ ‎.json‎:</p><textarea id="jsonOut" style="min-height:220px;direction:ltr;font-family:JetBrains Mono,monospace;font-size:11px">${esc(data)}</textarea><div class="row" style="margin-top:8px;justify-content:flex-start"><button class="btn pri" id="cpy" style="flex:0">העתק</button></div>`);
+  $('#cpy').onclick=async()=>{ try{ await navigator.clipboard.writeText(data); toast('הועתק') }catch(e){ $('#jsonOut').select(); toast('סמני והעתיקי ידנית') } };
+};
+$('#bLoad').onclick=()=>$('#fileIn').click();
+$('#fileIn').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=()=>{ try{ const j=JSON.parse(rd.result); const cfg=j.config||j; if(!cfg.ch||!cfg.comps) throw 0;
+  hydrate(cfg); const n={id:uid(),name:(j.name||f.name.replace(/\.json$/,''))+' (נטען)',order:Date.now(),json:JSON.stringify(cfg),updatedAt:Date.now()}; Store.put(n); loadCfg(n.id); toast('נטען כקונפיגורציה חדשה'); }
+  catch(err){ toast('הקובץ לא נראה כמו קונפיגורציה של הלוח הזה') } }; rd.readAsText(f); e.target.value=''; };
+document.addEventListener('keydown',e=>{
+  if(e.target.closest&&e.target.closest('input,textarea,select')) return;
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault(); e.shiftKey?redo():undo()}
+  else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo()}
+  else if(e.key==='Escape'){ if($('#modal').classList.contains('on')) closeModal(); else {UI.sel=null;renderSide();rerender()} }
+  else if(UI.sel&&UI.mode==='design'&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','PageUp','PageDown'].includes(e.key)){ e.preventDefault(); const st=e.shiftKey?5:0.5;
+    commit(s=>{const c=s.comps.find(k=>k.id===UI.sel); if(!c||c.locked||['wheels','armtip','arm','binact','bin'].includes(c.mount)&&c.key!=='bin') return;
+      if(e.key==='ArrowRight')c.x+=st; if(e.key==='ArrowLeft')c.x-=st; if(e.key==='ArrowUp')c.y+=st; if(e.key==='ArrowDown')c.y-=st; if(e.key==='PageUp'){c.z+=st;if(c.mount==='top')c.mount='free'} if(e.key==='PageDown'){c.z=Math.max(0,c.z-st)} }); }
+});
+
+/* ================== boot ================== */
+resize(); fitView(); renderAll();
+$('#bGh').onclick=openGhConnect;
+Store.init();
+window.__kli={hydrate,get S(){return S},get RES(){return RES},compute,makeDefault,resolve,UI,CFG,commit,ORB,fitView};
+</script>
+</body>
+</html>
